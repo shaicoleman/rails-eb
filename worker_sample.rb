@@ -1,15 +1,21 @@
 require 'sinatra/base'
 require 'logger'
+require 'json'
 
 class WorkerSample < Sinatra::Base
     set :logging, true
 
     set :public_folder, 'public'
 
+    set :default_content_type, 'application/json'
+
     @@logger = Logger.new('/tmp/sample-app.log')
 
     get "/" do
-        redirect '/index.html'
+      hostname = "#{`hostname`.chomp}"
+      build_info = File.read('./_meta/build-info.txt').scan(/^([^:]+): (.*)$/).to_h
+      now = "#{Time.now.utc}"
+      JSON.dump(now: now, hostname: hostname, build_info: build_info)
     end
 
     post '/' do
