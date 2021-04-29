@@ -6,9 +6,9 @@ require 'fileutils'
 
 def main
   check_root
-  copy_files
   install_repos
   install_yum_packages
+  copy_files
 end
 
 FILES = [
