@@ -6,6 +6,7 @@ require 'fileutils'
 
 def main
   check_root
+  install_eatmydata
   install_repos
   install_yum_packages
   copy_files
@@ -31,6 +32,18 @@ YUM_PACKAGES = [
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
 ]
+
+def install_eatmydata
+  unless File.exist?('/etc/yum.repos.d/percona-prel-release.repo')
+    run('yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm')
+  end
+
+  unless File.exist?('/usr/bin/eatmydata')
+    run('yum -y install libeatmydata')
+  end
+
+  ENV['LD_PRELOAD'] = '/usr/lib/x86_64-linux-gnu/libeatmydata.so'
+end
 
 def install_repos
   enable_amazon_linux_extras
