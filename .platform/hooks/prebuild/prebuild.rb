@@ -7,10 +7,7 @@ require 'fileutils'
 def main
   check_root
   copy_files
-  enable_amazon_linux_extras
-  install_epel_repo
-  install_nodejs_repo
-  install_yarn_repo
+  install_repos
   install_yum_packages
 end
 
@@ -34,6 +31,13 @@ YUM_PACKAGES = [
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
 ]
+
+def install_repos
+  enable_amazon_linux_extras
+  install_epel_repo
+  install_nodejs_repo
+  install_yarn_repo
+end
 
 def check_root
   abort 'Must be root' unless Process.uid == 0
