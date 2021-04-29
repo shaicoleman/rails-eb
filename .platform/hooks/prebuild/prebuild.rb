@@ -13,6 +13,7 @@ def main
 end
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
+
 YUM_PACKAGES = [ 
   { package: 'htop', creates: '/usr/bin/htop' },
   { package: 'strace', creates: '/usr/bin/strace' },
@@ -21,6 +22,7 @@ YUM_PACKAGES = [
   { package: 'nodejs', creates: '/usr/bin/node' },
   { package: 'yarn', creates: '/usr/bin/yarn' },
   { package: 'postgresql', creates: '/usr/bin/psql' },
+  { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: 'https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm', creates: '/usr/local/bin/wkhtmltopdf' }
 ]
 
@@ -43,6 +45,8 @@ def install_epel_repo
 end
 
 def install_nodejs_repo
+  return if File.exist?('/etc/yum.repos.d/nodesource-el7.repo')
+
   FileUtils.rm_rf('/opt/elasticbeanstalk/support/node-install')
   FileUtils.rm_f('/usr/bin/node') if File.symlink?('/usr/bin/node')
   
@@ -56,18 +60,27 @@ def install_yarn_repo
 end
 
 def install_yum_packages
-  to_install = YUM_PACKAGES.reject { |item| File.exists?(item[:creates]) } \
-                                  .map { |item| item[:package] }
+  to_install = YUM_PACKAGES.reject { |item| Dir.glob(item[:creates]).any? } \
+                           .map { |item| item[:package] }
   return if to_install.empty?
 
   run("yum -y install #{to_install.join(' ')}")
 end
 
 def run(cmd, ignore_error: false)
-  puts "Running: #{cmd}"
-  stdout_str, stderr_str, status = Open3.capture3(cmd)  
-  abort "Error running: #{cmd}\nOutput: #{stdout_str}, Errors: #{stderr_str}" unless status.success?
+  log("Running: #{cmd}")
+  stdout_str, stderr_str, status = Open3.capture3(cmd)
+  unless status.success?
+    message = "Error running: #{cmd}\nOutput: #{stdout_str}, Errors: #{stderr_str}"
+    log(message)
+    abort(message)
+  end
   { stdout: stdout_str, stderr: stderr_str, status: status }
+end
+
+def log(message)
+  puts message
+  File.open('/var/log/prebuild.log', 'a') { |f| f.print "#{Time.now.utc} #{message}\n" }
 end
 
 main
