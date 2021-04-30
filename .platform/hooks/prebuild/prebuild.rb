@@ -70,7 +70,7 @@ def copy_files
     FileUtils.mkdir_p(File.dirname(target))
     FileUtils.cp(source, target)
     log("Copy: #{source} to #{target}")
-    @handlers << file[:handler] unless @handlers.include?(file[:handler])
+    add_handler(file[:handler])
   end
 end
 
@@ -113,6 +113,12 @@ end
 
 def reload_sysctl
   run('sysctl -p /etc/sysctl.d/local.conf', ignore_errors: true)
+end
+
+def add_handler(handler)
+  return unless handler
+
+  @handlers << handler unless @handlers.include?(handler)
 end
 
 def run_handlers
