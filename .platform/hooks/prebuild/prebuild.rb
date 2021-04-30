@@ -8,6 +8,7 @@ def main
   init
   enable_swap
   install_eatmydata
+  cleanup_yum_packages
   install_repos
   install_yum_packages
   copy_files
@@ -36,6 +37,13 @@ YUM_PACKAGES = [
   { package: 'postgresql', creates: '/usr/bin/psql' },
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
+]
+
+YUM_CLEANUP = [
+  { package: 'mariadb*', removes: '/usr/bin/mysql' },
+  { package: 'ImageMagick*', removes: '/usr/bin/Magick-config' },
+  { package: 'postgres*-9.2*', removes: '/usr/share/doc/postgresql-9*' },
+  { package: 'iptables*', removes: '/sbin/iptables' }
 ]
 
 def enable_swap
@@ -110,6 +118,14 @@ def install_yarn_repo
   return if File.exist?('/etc/yum.repos.d/yarn.repo')
 
   run('curl -sL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo')
+end
+
+def cleanup_yum_packages
+  to_cleanup = YUM_CLEANUP.select { |item| Dir.glob(item[:removes]).any? } \
+                          .map { |item| item[:package] }
+  return if to_cleanup.empty?
+
+  run("yum -y erase #{to_cleanup.join(' ')}")
 end
 
 def install_yum_packages
