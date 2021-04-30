@@ -15,7 +15,9 @@ end
 
 FILES = [
   { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
-  { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' }
+  { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
+  { source: 'bin/rails-console', target: '/home/ec2-user/bin/rails-console' },
+  { source: 'bin/rails-shell', target: '/home/ec2-user/bin/rails-shell' }
 ]
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
@@ -44,7 +46,7 @@ def install_eatmydata
     run('yum -y install libeatmydata')
   end
 
-  ENV['LD_PRELOAD'] = '/usr/lib/x86_64-linux-gnu/libeatmydata.so'
+  ENV['LD_PRELOAD'] = '/usr/lib64/libeatmydata.so'
 end
 
 def install_repos
@@ -65,6 +67,7 @@ def copy_files
     target = file[:target]
     next if File.exist?(target) && FileUtils.compare_file(source, target)
 
+    FileUtils.mkdir_p(File.dirname(target))
     FileUtils.cp(source, target)
     log("Copy: #{source} to #{target}")
     @handlers << file[:handler] unless @handlers.include?(file[:handler])
@@ -109,7 +112,7 @@ def install_yum_packages
 end
 
 def reload_sysctl
-  run('sysctl -p /etc/sysctl.d/local.conf')
+  run('sysctl -p /etc/sysctl.d/local.conf', ignore_errors: true)
 end
 
 def run_handlers
@@ -118,13 +121,13 @@ def run_handlers
   end
 end
 
-def run(cmd)
+def run(cmd, ignore_errors: false)
   log("Run: #{cmd}")
   stdout_str, stderr_str, status = Open3.capture3(cmd)
   unless status.success?
     message = "Error running: #{cmd}\nOutput: #{stdout_str}, Errors: #{stderr_str}"
     log(message)
-    abort(message)
+    abort(message) unless ignore_errors
   end
   { stdout: stdout_str, stderr: stderr_str, status: status }
 end
