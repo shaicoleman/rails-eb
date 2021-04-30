@@ -7,8 +7,6 @@ GEM
     puma (4.3.3)
       nio4r (~> 2.0)
     rack (2.2.2)
-    rack-parser (0.7.0)
-      rack
     rack-protection (2.0.8.1)
       rack
     ruby2_keywords (0.0.2)
@@ -24,8 +22,7 @@ PLATFORMS
 
 DEPENDENCIES
   puma
-  rack-parser
   sinatra
 
 BUNDLED WITH
-   2.1.2
+   2.2.15
