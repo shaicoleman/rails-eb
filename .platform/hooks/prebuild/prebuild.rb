@@ -5,15 +5,17 @@ require 'open3'
 require 'fileutils'
 
 def main
-  check_root
+  init
   install_eatmydata
   install_repos
   install_yum_packages
   copy_files
+  run_handlers
 end
 
 FILES = [
-  { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' }
+  { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
+  { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' }
 ]
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
@@ -52,8 +54,9 @@ def install_repos
   install_yarn_repo
 end
 
-def check_root
+def init
   abort 'Must be root' unless Process.uid == 0
+  @handlers = []
 end
 
 def copy_files
@@ -64,6 +67,7 @@ def copy_files
 
     FileUtils.cp(source, target)
     log("Copy: #{source} to #{target}")
+    @handlers << file[:handler] unless @handlers.include?(file[:handler])
   end
 end
 
@@ -102,6 +106,16 @@ def install_yum_packages
   return if to_install.empty?
 
   run("yum -y install #{to_install.join(' ')}")
+end
+
+def reload_sysctl
+  run('sysctl -p /etc/sysctl.d/local.conf')
+end
+
+def run_handlers
+  @handlers.each do |handler|
+    send(handler)
+  end
 end
 
 def run(cmd)
