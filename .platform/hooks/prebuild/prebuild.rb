@@ -6,6 +6,7 @@ require 'fileutils'
 
 def main
   init
+  enable_swap
   install_eatmydata
   install_repos
   install_yum_packages
@@ -36,6 +37,14 @@ YUM_PACKAGES = [
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
 ]
+
+def enable_swap
+  return if File.read('/proc/swaps').include?('/swapfile')
+
+  total_ram_kb = `cat /proc/meminfo`.match(/^MemTotal:\s+(\d+) kB/)&.captures.first&.to_i
+  swap_size_kb = [total_ram_kb * 0.25, 1048576].max.ceil
+  run("fallocate -l #{swap_size_kb}K /swapfile; mkswap -f /swapfile; chmod 600 /swapfile; swapon /swapfile")
+end
 
 def install_eatmydata
   unless File.exist?('/etc/yum.repos.d/percona-prel-release.repo')
