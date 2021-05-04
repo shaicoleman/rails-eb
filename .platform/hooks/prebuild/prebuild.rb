@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/opt/elasticbeanstalk/lib/ruby/bin/ruby
 # frozen_string_literal: true
 
 require 'open3'
@@ -6,6 +6,7 @@ require 'fileutils'
 
 def main
   init
+  check_ruby_version
   enable_swap
   install_eatmydata
   cleanup_yum_packages
@@ -76,6 +77,16 @@ end
 def init
   abort 'Must be root' unless Process.uid == 0
   @handlers = []
+end
+
+def check_ruby_version
+  return unless File.exist?('.ruby-version')
+  
+  expected_ruby_version = File.read('.ruby-version').strip
+  unless expected_ruby_version == RUBY_VERSION
+    log("Warning: .ruby-version mismatch - Expected: #{expected_ruby_version}, Actual: #{RUBY_VERSION}")
+    FileUtils.mv('.ruby-version', '.ruby-version-mismatch')
+  end
 end
 
 def copy_files
