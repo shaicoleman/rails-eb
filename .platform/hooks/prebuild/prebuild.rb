@@ -12,6 +12,7 @@ def main
   cleanup_yum_packages
   install_repos
   install_yum_packages
+  autoremove_yum_packages
   copy_files
   run_handlers
   finish
@@ -45,7 +46,10 @@ YUM_CLEANUP = [
   { package: 'mariadb*', removes: '/usr/bin/mysql' },
   { package: 'ImageMagick*', removes: '/usr/bin/Magick-config' },
   { package: 'postgres*-9.2*', removes: '/usr/share/doc/postgresql-9*' },
-  { package: 'iptables*', removes: '/sbin/iptables' }
+  { package: 'iptables*', removes: '/sbin/iptables' },
+  { package: 'xfs*', removes: '/sbin/xfsdump' },
+  { package: 'hunspell*', removes: '/bin/hunspell' },
+  { package: 'tcsh', removes: '/bin/tcsh' }
 ]
 
 def enable_swap
@@ -151,6 +155,10 @@ def install_yum_packages
   return if to_install.empty?
 
   run("yum -y install #{to_install.join(' ')}")
+end
+
+def autoremove_yum_packages
+  run('yum -y autoremove') if File.exist?('/usr/bin/pango-list')
 end
 
 def reload_sysctl
