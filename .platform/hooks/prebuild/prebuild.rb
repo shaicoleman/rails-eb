@@ -83,8 +83,9 @@ def check_ruby_version
   return unless File.exist?('.ruby-version')
   
   expected_ruby_version = File.read('.ruby-version').strip
-  unless expected_ruby_version == RUBY_VERSION
-    log("Warning: .ruby-version mismatch - Expected: #{expected_ruby_version}, Actual: #{RUBY_VERSION}")
+  current_ruby_version = `ruby -e 'print RUBY_VERSION'`
+  unless expected_ruby_version == current_ruby_version
+    log("Warning: .ruby-version mismatch - Expected: #{expected_ruby_version}, Current: #{current_ruby_version}. Renamed")
     FileUtils.mv('.ruby-version', '.ruby-version-mismatch')
   end
 end
