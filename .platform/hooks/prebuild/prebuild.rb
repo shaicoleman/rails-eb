@@ -14,6 +14,7 @@ def main
   install_yum_packages
   copy_files
   run_handlers
+  finish
 end
 
 FILES = [
@@ -77,6 +78,10 @@ end
 def init
   abort 'Must be root' unless Process.uid == 0
   @handlers = []
+end
+
+def finish
+  log('Done')
 end
 
 def check_ruby_version
