@@ -1,0 +1,12 @@
+#!/bin/sh
+cat << EOF
+
+WARNING: Unauthorized access to this system is prohibited and will be prosecuted by law.
+All activities on this server are logged and monitored.
+
+$(ec2-metadata --instance-id --local-ipv4 --public-ipv4)
+
+$(cat /var/app/current/_meta/build-info.txt 2>/dev/null)
+deploy_env: ${DEPLOY_ENV}
+
+EOF

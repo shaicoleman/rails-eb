@@ -19,6 +19,7 @@ def main
 end
 
 FILES = [
+  { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', handler: 'update_motd' },
   { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
   { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
   { source: 'bin/rails-console', target: '/home/ec2-user/bin/rails-console' },
@@ -163,6 +164,10 @@ end
 
 def reload_sysctl
   run('sysctl -p /etc/sysctl.d/local.conf', ignore_errors: true)
+end
+
+def update_motd
+  run('update-motd')
 end
 
 def add_handler(handler)
