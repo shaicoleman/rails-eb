@@ -57,20 +57,22 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
   rpmbuild --rebuild $(basename "$FILE_SRPMS_URL")
 
 # ### app-base
-# FROM al2-dev AS app-base
-# COPY --chown=cffadmin:cffadmin --from=node $HOME/node $HOME/node
-# COPY --chown=cffadmin:cffadmin --from=ruby $HOME/ruby $HOME/ruby
-# ENV PATH="$HOME/.gem/ruby/2.6.0/bin:$HOME/ruby/bin:$HOME/node/bin:$HOME/file/bin:/usr/pgsql-10/bin:$PATH"
+FROM al2-dev AS app-base
+COPY --from=ruby /opt/rubies /opt/rubies
+ENV PATH="/opt/rubies/ruby-2.7.3/bin:$PATH"
+RUN \
+  echo ' ===> Creating webapp user' && \
+  adduser webapp && \
+  echo ' ===> Creating /var/app/staging directory' && \
+  mkdir -p /var/app/staging && \
+  chown -R webapp:webapp /var/app/staging
+USER webapp
+WORKDIR /var/app/staging
+ENV HOME=/home/webapp
+RUN \
+   echo ' ===> Creating .gemrc' && \
+   (echo 'gem: --user-install --no-document' > ~/.gemrc)
 
-# RUN \
-#   echo ' ===> Creating .gemrc' && \
-#   (echo 'gem: --user-install --no-document' > ~/.gemrc) && \
-#   echo ' ===> Uninstalling bundled gems' && \
-#   gem uninstall --executables did_you_mean minitest net-telnet power_assert rake test-unit xmlrpc && \
-#   echo ' ===> Updating bundler' && \
-#   gem install bundler -v=2.1.4 --no-post-install-message && \
-#   gem cleanup && \
-#   rm -rf ~/.gem/specs ~/.gem/ruby/2.6.0/cache ~/ruby/lib/ruby/gems/2.6.0/cache
 
 # ARG RAILS_ENV
 # ENV RAILS_ENV="$RAILS_ENV"
@@ -80,20 +82,20 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 # ENV DEVISE_SECRET_KEY="none"
 # ENV ENCRYPTION_KEY="123456044debc6f6c43f856bbb12e9c5070c33c63510586e30a4c60c3ecadb26"
 
+### ruby-bundle
+FROM app-base AS ruby-bundle
 
-# ### ruby-bundle
-# FROM app-base AS ruby-bundle
+COPY --chown=webapp:webapp Gemfile Gemfile.lock /var/app/staging
 
-# COPY --chown=cffadmin:cffadmin Gemfile Gemfile.lock cashanalytics/
-# RUN mkdir -p ~/cashanalytics/vendor/bundle/ruby/2.6.0
-# RUN --mount=type=cache,uid=1000,gid=1000,target=/home/cffadmin/cashanalytics/vendor/bundle/ruby/2.6.0/cache,sharing=locked \
-#   cd ~/cashanalytics && \
-#   echo " ===> Removing unused groups from Gemfile" && \
-#   perl -i -0pe "s/\ngroup((?!staging|production).)*? do.*?\n\s*end\s*/\n/sg" Gemfile && \
-#   echo " ===> Running bundle install ($RAILS_ENV environment)" && \
-#   bundle config --global jobs `nproc` && \
-#   bundle install --path vendor/bundle --quiet
-
+RUN mkdir -p /var/app/staging/vendor/bundle/ruby/2.7.0/cache
+RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle/ruby/2.7.0/cache,sharing=locked \
+  echo " ===> Removing unused groups from Gemfile" && \
+  perl -i -0pe "s/\ngroup((?!staging|production).)*? do.*?\n\s*end\s*/\n/sg" Gemfile && \
+  echo " ===> Configuring bundler" && \
+  bundle config set jobs `nproc` && \
+  bundle config set deployment 'true' && \
+  echo " ===> Running bundle install" && \
+  bundle install --quiet
 
 # ### yarn-packages
 # FROM app-base AS yarn-packages
