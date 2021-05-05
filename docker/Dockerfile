@@ -32,7 +32,9 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
   yum -y -q install gcc gcc-c++ git autoconf automake bzip2 make libtool file which && \
   echo ' ===> Installing Ruby dependencies' && \
   yum -y -q install openssl openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel ncurses-devel gmp-devel \
-                    postgresql10-devel libsodium
+                    postgresql10-devel libsodium && \
+  echo ' ===> Installing nodejs/yarn' && \
+  yum -y -q install nodejs yarn
 
 ### ruby
 FROM al2-dev AS ruby
@@ -73,7 +75,6 @@ RUN \
    echo ' ===> Creating .gemrc' && \
    (echo 'gem: --user-install --no-document' > ~/.gemrc)
 
-
 # ARG RAILS_ENV
 # ENV RAILS_ENV="$RAILS_ENV"
 # ARG NODE_ENV
@@ -98,27 +99,31 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,s
   echo " ===> Running bundle install" && \
   bundle install --quiet && \
   echo " ===> Copying bundle" && \
-  mkdir -p ~/build/bundle-copy && \
-  (tar -cf - --exclude 'vendor/bundle/ruby/2.7.0/cache' vendor/bundle | tar -xC ~/build/bundle-copy)
+  mkdir -p ~/build && \
+  (tar -cf - --exclude 'vendor/bundle/ruby/2.7.0/cache' vendor/bundle | tar -xC ~/build)
 
-# ### yarn-packages
-# FROM app-base AS yarn-packages
-# COPY --chown=cffadmin:cffadmin package.json yarn.lock .npmrc cashanalytics/
-# RUN mkdir -p ~/.cache/yarn
-# RUN --mount=type=cache,uid=1000,gid=1000,target=/home/cffadmin/.cache/yarn,sharing=locked \
-#   cd ~/cashanalytics && \
-#   echo " ===> Removing devDependencies from packages.json" && \
-#   perl -i -0pe "s/,\s+\"devDependencies[^}]+}//" package.json && \
-#   echo " ===> yarn install" && \
-#   yarn install --silent --frozen-lockfile --non-interactive
-
+### yarn-packages
+FROM app-base AS yarn-packages
+COPY --chown=webapp:webapp package.json yarn.lock .npmrc /var/app/staging
+RUN mkdir -p ~/.cache/yarn /var/app/staging/node_modules
+RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.cache/yarn,sharing=locked \
+    --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules,sharing=locked \
+  echo " ===> Removing devDependencies from packages.json" && \
+  perl -i -0pe "s/,\s+\"devDependencies[^}]+}//" package.json && \
+  echo " ===> yarn install" && \
+  yarn install --silent --frozen-lockfile --non-interactive && \
+  yarn autoclean && \
+  echo " ===> Copying node_modules" && \
+  mkdir -p ~/build && \
+  cp -r node_modules ~/build/node_modules
 
 # main
 FROM app-base
 USER root
 COPY --from=ruby /opt/rubies /opt/rubies
 USER webapp
-COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/build/bundle-copy /var/app/staging
+COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/build /var/app/staging
+COPY --chown=webapp:webapp --from=yarn-packages /home/webapp/build /var/app/staging
 
 # USER root
 # RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
