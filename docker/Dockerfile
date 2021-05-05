@@ -87,15 +87,19 @@ FROM app-base AS ruby-bundle
 
 COPY --chown=webapp:webapp Gemfile Gemfile.lock /var/app/staging
 
-RUN mkdir -p /var/app/staging/vendor/bundle/ruby/2.7.0/cache
-RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle/ruby/2.7.0/cache,sharing=locked \
+RUN mkdir -p /var/app/staging/vendor/bundle
+RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,sharing=locked \
   echo " ===> Removing unused groups from Gemfile" && \
   perl -i -0pe "s/\ngroup((?!staging|production).)*? do.*?\n\s*end\s*/\n/sg" Gemfile && \
   echo " ===> Configuring bundler" && \
   bundle config set jobs `nproc` && \
-  bundle config set deployment 'true' && \
+  bundle config set clean true && \
+  bundle config set deployment true && \
   echo " ===> Running bundle install" && \
-  bundle install --quiet
+  bundle install --quiet && \
+  echo " ===> Copying bundle" && \
+  mkdir -p ~/build/bundle-copy && \
+  (tar -cf - --exclude 'vendor/bundle/ruby/2.7.0/cache' vendor/bundle | tar -xC ~/build/bundle-copy)
 
 # ### yarn-packages
 # FROM app-base AS yarn-packages
@@ -109,8 +113,13 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle/r
 #   yarn install --silent --frozen-lockfile --non-interactive
 
 
-# # main
-# FROM app-base
+# main
+FROM app-base
+USER root
+COPY --from=ruby /opt/rubies /opt/rubies
+USER webapp
+COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/build/bundle-copy /var/app/staging
+
 # USER root
 # RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 #   echo ' ===> Installing wkhtmltopdf dependencies' && \
