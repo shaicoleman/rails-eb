@@ -6,10 +6,8 @@ require 'fileutils'
 
 def main
   init
-  check_ruby_version
-  upgrade_bundler
+  enable_eatmydata
   enable_swap
-  install_eatmydata
   cleanup_yum_packages
   install_repos
   install_yum_packages
@@ -17,6 +15,8 @@ def main
   copy_files
   run_handlers
   change_webapp_shell
+  check_ruby_version
+  upgrade_bundler
   finish
 end
 
@@ -31,10 +31,11 @@ FILES = [
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
 
+EATMYDATA_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/eatmydata/libeatmydata-0.1-00.21.el7.centos.x86_64.rpm'
 FILE_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm'
 FILE_LIBS_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm'
-WKHTMLTOPDF_RPM_URL = \
-  'https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm'
+WKHTMLTOPDF_RPM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/wkhtmltopdf/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm'
+DEEPSECURITY_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity/Agent-PGPCore-amzn2-20.0.0-2204.x86_64.rpm'
 
 YUM_PACKAGES = [
   { package: 'htop', creates: '/usr/bin/htop' },
@@ -47,7 +48,8 @@ YUM_PACKAGES = [
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
   { package: FILE_LIBS_URL, creates: '/usr/share/doc/file-libs-5.39' },
-  { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
+  { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' },
+  { package: DEEPSECURITY_URL, creates: '/opt/ds_agent/ds_agent' }
 ]
 
 YUM_CLEANUP = [
@@ -68,13 +70,9 @@ def enable_swap
   run("fallocate -l #{swap_size_kb}K /swapfile; mkswap -f /swapfile; chmod 600 /swapfile; swapon /swapfile")
 end
 
-def install_eatmydata
-  unless File.exist?('/etc/yum.repos.d/percona-prel-release.repo')
-    run('yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm')
-  end
-
+def enable_eatmydata
   unless File.exist?('/usr/bin/eatmydata')
-    run('yum -y install libeatmydata')
+    run("yum -y install #{EATMYDATA_URL}")
   end
 
   ENV['LD_PRELOAD'] = '/usr/lib64/libeatmydata.so'
