@@ -16,7 +16,7 @@ def main
   autoremove_yum_packages
   copy_files
   run_handlers
-  webapp_bash_shell
+  change_webapp_shell
   finish
 end
 
@@ -197,7 +197,7 @@ def run_handlers
   end
 end
 
-def webapp_bash_shell
+def change_webapp_shell
   return if File.read('/etc/passwd').match?(%r{^webapp:.*:/bin/bash$})
 
   run('usermod --shell /bin/bash webapp')
