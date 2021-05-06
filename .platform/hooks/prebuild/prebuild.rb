@@ -31,6 +31,8 @@ FILES = [
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
 
+FILE_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm'
+FILE_LIBS_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm'
 WKHTMLTOPDF_RPM_URL = \
   'https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm'
 
@@ -43,6 +45,8 @@ YUM_PACKAGES = [
   { package: 'yarn', creates: '/usr/bin/yarn' },
   { package: 'postgresql', creates: '/usr/bin/psql' },
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
+  { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
+  { package: FILE_LIBS_URL, creates: '/usr/share/doc/file-libs-5.39' },
   { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
 ]
 
