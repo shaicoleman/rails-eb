@@ -4,8 +4,13 @@
 require 'open3'
 
 def main
+  init
   update_motd
   finish  
+end
+
+def init
+  abort 'Must be root' unless Process.uid == 0
 end
 
 def update_motd
