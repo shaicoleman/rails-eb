@@ -93,10 +93,11 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,s
   echo " ===> Removing unused groups from Gemfile" && \
   perl -i -0pe "s/\ngroup((?!staging|production).)*? do.*?\n\s*end\s*/\n/sg" Gemfile && \
   echo " ===> Configuring bundler" && \
-  bundle config set jobs `nproc` && \
+  bundle config set jobs 8 && \
   bundle config set clean true && \
   bundle config set deployment true && \
   echo " ===> Running bundle install" && \
+  export MAKE="make --jobs 8" && \
   bundle install --quiet && \
   echo " ===> Copying bundle" && \
   mkdir -p ~/build && \
