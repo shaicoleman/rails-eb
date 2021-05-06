@@ -15,6 +15,7 @@ def main
   autoremove_yum_packages
   copy_files
   run_handlers
+  webapp_bash_shell
   finish
 end
 
@@ -180,6 +181,12 @@ def run_handlers
   @handlers.each do |handler|
     send(handler)
   end
+end
+
+def webapp_bash_shell
+  return if File.read('/etc/passwd').match?(%r{^webapp:.*:/bin/bash$})
+
+  run('usermod --shell /bin/bash webapp')
 end
 
 def run(cmd, ignore_errors: false)
