@@ -7,6 +7,7 @@ require 'fileutils'
 def main
   init
   check_ruby_version
+  upgrade_bundler
   enable_swap
   install_eatmydata
   cleanup_yum_packages
@@ -100,6 +101,14 @@ def check_ruby_version
     log("Warning: .ruby-version mismatch - Expected: #{expected_ruby_version}, Current: #{current_ruby_version}. Renamed")
     FileUtils.mv('.ruby-version', '.ruby-version-mismatch')
   end
+end
+
+def upgrade_bundler
+  gemfile_version = File.read('Gemfile.lock').match(/BUNDLED WITH\s+(\S+)/)&.captures&.first
+  installed_version = `ruby -e "require 'bundler'; print Bundler::VERSION"`
+  return if Gem::Version.new(installed_version) >= Gem::Version.new(gemfile_version)
+
+  run('gem install bundler')
 end
 
 def copy_files
