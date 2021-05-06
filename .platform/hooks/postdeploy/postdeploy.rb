@@ -5,10 +5,15 @@ require 'open3'
 
 def main
   update_motd
+  finish  
 end
 
 def update_motd
   run('update-motd')
+end
+
+def finish
+  log('Postdeploy done')  
 end
 
 def run(cmd, ignore_errors: false)
@@ -24,7 +29,7 @@ end
 
 def log(message)
   puts message
-  File.open('/var/log/prebuild.log', 'a') { |f| f.print "#{Time.now.utc} #{message}\n" }
+  File.open('/var/log/deploy.log', 'a') { |f| f.print "#{Time.now.utc} #{message}\n" }
 end
 
 main

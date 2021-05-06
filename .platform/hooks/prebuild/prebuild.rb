@@ -87,7 +87,7 @@ def init
 end
 
 def finish
-  log('Done')
+  log('Prebuild done')
 end
 
 def check_ruby_version
@@ -202,7 +202,7 @@ end
 
 def log(message)
   puts message
-  File.open('/var/log/prebuild.log', 'a') { |f| f.print "#{Time.now.utc} #{message}\n" }
+  File.open('/var/log/deploy.log', 'a') { |f| f.print "#{Time.now.utc} #{message}\n" }
 end
 
 main
