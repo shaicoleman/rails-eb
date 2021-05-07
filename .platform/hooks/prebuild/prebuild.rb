@@ -26,7 +26,8 @@ FILES = [
   { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
   { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
   { source: 'bin/rails-console', target: '/home/ec2-user/bin/rails-console' },
-  { source: 'bin/rails-shell', target: '/home/ec2-user/bin/rails-shell' }
+  { source: 'bin/rails-shell', target: '/home/ec2-user/bin/rails-shell' },
+  { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' }
 ]
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
