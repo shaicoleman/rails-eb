@@ -8,9 +8,9 @@ def main
   init
   enable_eatmydata
   enable_swap
-  cleanup_yum_packages
   install_repos
   install_yum_packages
+  cleanup_yum_packages
   autoremove_yum_packages
   copy_files
   run_handlers
@@ -44,7 +44,7 @@ YUM_PACKAGES = [
   { package: 'ncdu', creates: '/usr/bin/ncdu' },
   { package: 'nodejs', creates: '/usr/bin/node' },
   { package: 'yarn', creates: '/usr/bin/yarn' },
-  { package: 'postgresql', creates: '/usr/bin/psql' },
+  { package: 'postgresql', creates: '/usr/share/doc/postgresql-10.*' },
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
   { package: FILE_LIBS_URL, creates: '/usr/share/doc/file-libs-5.39' },
@@ -55,7 +55,7 @@ YUM_PACKAGES = [
 YUM_CLEANUP = [
   { package: 'mariadb*', removes: '/usr/bin/mysql' },
   { package: 'ImageMagick*', removes: '/usr/bin/Magick-config' },
-  { package: 'postgres*-9.2*', removes: '/usr/share/doc/postgresql-9*' },
+  { package: 'postgres*-9*', removes: '/usr/share/doc/postgresql-9*' },
   { package: 'iptables*', removes: '/sbin/iptables' },
   { package: 'xfs*', removes: '/sbin/xfsdump' },
   { package: 'hunspell*', removes: '/bin/hunspell' },
@@ -169,8 +169,6 @@ def install_yum_packages
   return if to_install.empty?
 
   run("yum -y install #{to_install.join(' ')}")
-
-  error("Installing did not create expected file: #{item[:creates]}") unless File.exist?(item[:creates])
 end
 
 def autoremove_yum_packages
