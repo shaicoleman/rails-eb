@@ -58,14 +58,6 @@ RUN \
    echo ' ===> Creating .gemrc' && \
    (echo 'gem: --user-install --no-document' > ~/.gemrc)
 
-# ARG RAILS_ENV
-# ENV RAILS_ENV="$RAILS_ENV"
-# ARG NODE_ENV
-# ENV NODE_ENV="$NODE_ENV"
-# ENV SECRET_KEY_BASE="none"
-# ENV DEVISE_SECRET_KEY="none"
-# ENV ENCRYPTION_KEY="123456044debc6f6c43f856bbb12e9c5070c33c63510586e30a4c60c3ecadb26"
-
 ### ruby-bundle
 FROM app-base AS ruby-bundle
 
@@ -73,6 +65,9 @@ COPY --chown=webapp:webapp Gemfile Gemfile.lock /var/app/staging
 
 RUN mkdir -p /var/app/staging/vendor/bundle
 RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,sharing=locked \
+  PATH="$HOME/.gem/ruby/2.7.0/bin:$PATH" && \
+  echo " ===> Upgrading bundler" && \
+  gem install bundler && \
   echo " ===> Removing unused groups from Gemfile" && \
   perl -i -0pe "s/\ngroup((?!staging|production).)*? do.*?\n\s*end\s*/\n/sg" Gemfile && \
   echo " ===> Configuring bundler" && \
@@ -101,35 +96,34 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.cache/yarn,sharing
   mkdir -p ~/build && \
   cp -r node_modules ~/build/node_modules
 
-# main
+# app-rails
 FROM app-base
 COPY --chown=root:root --from=ruby /opt/rubies /opt/rubies
 COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/build .
 COPY --chown=webapp:webapp --from=yarn-packages /home/webapp/build .
-COPY --chown=webapp:webapp Gemfile* *.js config.ru Rakefile .browserslistrc .
+COPY --chown=webapp:webapp Gemfile* *.js* config.ru Rakefile .browserslistrc .
 COPY --chown=webapp:webapp app app/
 COPY --chown=webapp:webapp bin bin/
 COPY --chown=webapp:webapp config config/
-# COPY --chown=webapp:webapp docker/rails/secrets.yml config/
-# COPY --chown=webapp:webapp docker/rails/database.yml config/
 COPY --chown=webapp:webapp db db/
 COPY --chown=webapp:webapp lib lib/
 COPY --chown=webapp:webapp public/*.* public/
 USER webapp
 
-# ENV PATH="$HOME/.gem/ruby/2.6.0/bin:$HOME/ruby/bin:$HOME/node/bin:$HOME/file/bin:$HOME/wkhtmltopdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ENV RAILS_ENV=production
+ENV NODE_ENV=production
+ENV SECRET_KEY_BASE="none"
+ENV DEVISE_SECRET_KEY="none"
+ENV ENCRYPTION_KEY="123456044debc6f6c43f856bbb12e9c5070c33c63510586e30a4c60c3ecadb26"
+ENV PATH="$HOME/.gem/ruby/2.7.0/bin:$PATH"
 
-
-# RUN cd ~/cashanalytics; mkdir -p node_modules/.cache tmp/cache/assets tmp/cache/webpacker/babel-loader-node-modules
-# RUN --mount=type=cache,uid=1000,gid=1000,target=/home/cffadmin/cashanalytics/node_modules/.cache,sharing=locked \
-#     --mount=type=cache,uid=1000,gid=1000,target=/home/cffadmin/cashanalytics/tmp/cache/assets,sharing=locked \
-#     --mount=type=cache,uid=1000,gid=1000,target=/home/cffadmin/cashanalytics/tmp/cache/webpacker/babel-loader-node-modules,sharing=locked \
-#   cd ~/cashanalytics && \
-#   mkdir -p tmp log && \
-#   rm -f bin/yarn && \
-#   echo " ===> rails assets:precompile" && \
-#   bin/rails assets:precompile && \
-#   rm -rf log/*
+RUN cd ~/cashanalytics; mkdir -p node_modules/.cache tmp/cache/assets tmp/cache/webpacker/babel-loader-node-modules
+RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.cache,sharing=locked \
+    --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/tmp/cache/assets,sharing=locked \
+    --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/tmp/cache/webpacker/babel-loader-node-modules,sharing=locked \
+    echo " ===> rails assets:precompile" && \
+    rm -f bin/yarn && \
+    bin/rails assets:precompile
 
 # RUN \
 #   cd ~/cashanalytics && \
