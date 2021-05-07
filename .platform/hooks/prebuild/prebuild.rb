@@ -169,6 +169,8 @@ def install_yum_packages
   return if to_install.empty?
 
   run("yum -y install #{to_install.join(' ')}")
+
+  error("Installing did not create expected file: #{item[:creates]}") unless File.exist?(item[:creates])
 end
 
 def autoremove_yum_packages
@@ -206,8 +208,7 @@ def run(cmd, ignore_errors: false)
   stdout_str, stderr_str, status = Open3.capture3(cmd)
   unless status.success?
     message = "Error running: #{cmd}\nOutput: #{stdout_str}, Errors: #{stderr_str}"
-    log(message)
-    abort(message) unless ignore_errors
+    error(message, ignore_errors: ignore_errors)
   end
   { stdout: stdout_str, stderr: stderr_str, status: status }
 end
@@ -215,6 +216,11 @@ end
 def log(message)
   puts message
   File.open('/var/log/deploy.log', 'a') { |f| f.print "#{Time.now.utc} #{message}\n" }
+end
+
+def error(message, ignore_errors: false)
+  log(message)
+  abort(message) unless ignore_errors
 end
 
 main
