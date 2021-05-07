@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
   echo ' ===> Installing development tools' && \
-  yum -y -q install gcc gcc-c++ git autoconf automake bzip2 make libtool which \
+  yum -y -q install gcc gcc-c++ git autoconf automake bzip2 make libtool which p7zip xz tar \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm \
   echo ' ===> Installing Ruby dependencies' && \
@@ -35,11 +35,8 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 ### ruby
 FROM al2-dev AS ruby
 RUN \
-  echo ' ===> Downloading ruby-build' && \
-  git clone --depth=1 https://github.com/rbenv/ruby-build.git ~/ruby-build && \
-  echo ' ===> Building ruby' && \
-  RUBY_CONFIGURE_OPTS="--disable-install-doc --disable-jit-support --prefix=/opt/rubies/ruby-2.7.3 --enable-shared" ~/ruby-build/bin/ruby-build 2.7.3 /opt/rubies/ruby-2.7.3 && \
-  rm -rf /opt/rubies/ruby-2.7.3/lib/ruby/gems/2.7.0/cache
+  mkdir -p /opt/rubies && \
+  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/ruby/ruby-2.7.3.tar.xz | tar xJ -C /opt/rubies
 
 # ### app-base
 FROM al2-dev AS app-base
@@ -124,6 +121,9 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.c
     echo " ===> rails assets:precompile" && \
     rm -f bin/yarn && \
     bin/rails assets:precompile
+
+# RUN \
+#     7za -bd -snl -mm=Deflate a /build/app.zip
 
 # RUN \
 #   cd ~/cashanalytics && \
