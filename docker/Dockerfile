@@ -122,8 +122,9 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.c
     rm -f bin/yarn && \
     bin/rails assets:precompile
 
-# RUN \
-#     7za -bd -snl -mm=Deflate a /build/app.zip
+RUN \
+  mkdir -p ~/build && \
+  7za -bd -snl -mm=Deflate -xr!node_modules -xr!log/* a ~/build/app.zip
 
 # RUN \
 #   cd ~/cashanalytics && \
