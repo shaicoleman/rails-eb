@@ -11,8 +11,8 @@ def main
   configure_elastic_beanstalk
   clean_old_build
   write_build_info
-  bundle_gems
-  zip_build
+  docker_build
+  copy_app
 end
 
 def configure_elastic_beanstalk
@@ -38,14 +38,14 @@ def write_build_info
   File.write('_meta/build-info.txt', build_info)
 end
 
-def bundle_gems
-  `bundle config set --local deployment 'true'`
-  `bundle package`
+def docker_build
+  `docker/build.sh`
 end
 
-def zip_build
-  excludes_str = EXCLUDES.map { |item| "-x!#{item}" }.join(' ')
-  `7za -bd -snl -mm=Deflate a .build/app.zip #{excludes_str} .`
+def copy_app
+  container_id = `docker create --rm al2`.chomp
+  `docker cp #{container_id}:/home/webapp/build/app.zip .build/app.zip`
+  `docker rm #{container_id}`
 end
 
 main

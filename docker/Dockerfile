@@ -105,6 +105,7 @@ COPY --chown=webapp:webapp config config/
 COPY --chown=webapp:webapp db db/
 COPY --chown=webapp:webapp lib lib/
 COPY --chown=webapp:webapp public/*.* public/
+COPY --chown=webapp:webapp .platform .platform/
 USER webapp
 
 ENV RAILS_ENV=production
