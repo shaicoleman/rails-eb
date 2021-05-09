@@ -71,11 +71,11 @@ def enable_swap
   run("fallocate -l #{swap_size_kb}K /swapfile; mkswap -f /swapfile; chmod 600 /swapfile; swapon /swapfile")
 end
 
+# Only enabled on first run
 def enable_eatmydata
-  unless File.exist?('/usr/bin/eatmydata')
-    run("yum -y install #{EATMYDATA_URL}")
-  end
+  return File.exist?('/usr/bin/eatmydata')
 
+  run("yum -y install #{EATMYDATA_URL}")
   ENV['LD_PRELOAD'] = '/usr/lib64/libeatmydata.so'
 end
 
