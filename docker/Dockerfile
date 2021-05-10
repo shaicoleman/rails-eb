@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
   echo ' ===> Installing development tools' && \
-  yum -y -q install gcc gcc-c++ git autoconf automake bzip2 make libtool which p7zip xz tar \
+  yum -y -q install gcc gcc-c++ git autoconf automake make libtool which xz tar \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm \
   echo ' ===> Installing Ruby dependencies' && \
@@ -94,11 +94,11 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.cache/yarn,sharing
   cp -r node_modules ~/build/node_modules
 
 # app-rails
-FROM app-base
+FROM app-base AS app-rails
 COPY --chown=root:root --from=ruby /opt/rubies /opt/rubies
 COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/build .
 COPY --chown=webapp:webapp --from=yarn-packages /home/webapp/build .
-COPY --chown=webapp:webapp Gemfile* *.js* config.ru Rakefile .browserslistrc .
+COPY --chown=webapp:webapp Gemfile* *.js* config.ru Rakefile .browserslistrc yarn.lock Procfile cron.yaml .
 COPY --chown=webapp:webapp app app/
 COPY --chown=webapp:webapp bin bin/
 COPY --chown=webapp:webapp config config/
@@ -123,9 +123,9 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.c
     rm -f bin/yarn && \
     bin/rails assets:precompile
 
-RUN \
-  mkdir -p ~/build && \
-  7za -bd -snl -mm=Deflate -xr!node_modules -xr!log/* a ~/build/app.zip
+# app-rails
+FROM app-rails AS app-build
+RUN rm -rf node_modules/ log/*.log
 
 # RUN \
 #   cd ~/cashanalytics && \

@@ -12,7 +12,7 @@ def main
   clean_old_build
   write_build_info
   docker_build
-  copy_app
+  # copy_app
 end
 
 def configure_elastic_beanstalk
@@ -40,12 +40,6 @@ end
 
 def docker_build
   `docker/build.sh`
-end
-
-def copy_app
-  container_id = `docker create --rm al2`.chomp
-  `docker cp #{container_id}:/home/webapp/build/app.zip .build/app.zip`
-  `docker rm #{container_id}`
 end
 
 main
