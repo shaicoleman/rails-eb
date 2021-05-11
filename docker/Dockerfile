@@ -104,8 +104,6 @@ COPY --chown=webapp:webapp bin bin/
 COPY --chown=webapp:webapp config config/
 COPY --chown=webapp:webapp db db/
 COPY --chown=webapp:webapp lib lib/
-COPY --chown=webapp:webapp public/*.* public/
-COPY --chown=webapp:webapp .platform .platform/
 USER webapp
 
 ENV RAILS_ENV=production
@@ -122,6 +120,10 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.c
     echo " ===> rails assets:precompile" && \
     rm -f bin/yarn && \
     bin/rails assets:precompile
+
+COPY --chown=webapp:webapp yarn.lock Procfile cron.yaml .
+COPY --chown=webapp:webapp .platform .platform/
+COPY --chown=webapp:webapp public/*.* public/
 
 RUN \
   mkdir -p ~/build && \
