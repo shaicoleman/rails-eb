@@ -41,7 +41,6 @@ RUN \
 # ### app-base
 FROM al2-dev AS app-base
 COPY --from=ruby /opt/rubies /opt/rubies
-ENV PATH="/opt/rubies/ruby-2.7.3/bin:$PATH"
 RUN \
   echo ' ===> Creating webapp user' && \
   adduser webapp && \
@@ -51,6 +50,7 @@ RUN \
 USER webapp
 WORKDIR /var/app/staging
 ENV HOME=/home/webapp
+ENV PATH="$HOME/.local/share/gem/ruby/2.7.0/bin:/opt/rubies/ruby-2.7.3/bin:$PATH"
 RUN \
    echo ' ===> Creating .gemrc' && \
    (echo 'gem: --user-install --no-document' > ~/.gemrc)
@@ -64,19 +64,19 @@ RUN mkdir -p /var/app/staging/vendor/bundle
 RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,sharing=locked \
   PATH="$HOME/.local/share/gem/ruby/2.7.0/bin:$PATH" && \
   echo " ===> Upgrading bundler" && \
-  gem install bundler && \
+  gem install bundler --silent && \
   echo " ===> Configuring bundler" && \
-  bundle config set jobs 8 && \
-  bundle config set clean true && \
-  bundle config set deployment true && \
   bundle_without=$(ruby -e "puts (File.read('Gemfile').scan(/^\s*group\s*[^#]*do/).join(' ').scan(/:(\w+)/).flatten.uniq - %w[staging production]).join(':')") && \
-  bundle config set without "$bundle_without" && \
-  echo " ===> Running bundle install" && \
+  bundle config set --local without "$bundle_without" && \
+  bundle config set --local jobs 8 && \
+  bundle config set --local deployment true && \
+  bundle config set --local clean true && \
   export MAKE="make --jobs 8" && \
+  echo " ===> Running bundle install" && \
   bundle install --quiet && \
   echo " ===> Copying bundle" && \
   mkdir -p ~/build && \
-  (tar -cf - --exclude 'vendor/bundle/ruby/2.7.0/cache' .bundle vendor/bundle | tar -xC ~/build)
+  (tar -cf - --exclude 'vendor/bundle/ruby/2.7.0/cache' Gemfile Gemfile.lock .bundle vendor/bundle | tar -xC ~/build)
 
 ### yarn-packages
 FROM app-base AS yarn-packages
@@ -91,14 +91,14 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.cache/yarn,sharing
   yarn autoclean && \
   echo " ===> Copying node_modules" && \
   mkdir -p ~/build && \
-  cp -r node_modules ~/build/node_modules
+  cp -r package.json yarn.lock node_modules ~/build/
 
 # app-rails
 FROM app-base
 COPY --chown=root:root --from=ruby /opt/rubies /opt/rubies
 COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/build .
 COPY --chown=webapp:webapp --from=yarn-packages /home/webapp/build .
-COPY --chown=webapp:webapp Gemfile* *.js* config.ru Rakefile .browserslistrc .
+COPY --chown=webapp:webapp *.js* config.ru Rakefile .browserslistrc .
 COPY --chown=webapp:webapp app app/
 COPY --chown=webapp:webapp bin bin/
 COPY --chown=webapp:webapp config config/
@@ -120,7 +120,7 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.c
     rm -f bin/yarn && \
     bin/rails assets:precompile
 
-COPY --chown=webapp:webapp yarn.lock Procfile cron.yaml .
+COPY --chown=webapp:webapp Procfile cron.yaml .
 COPY --chown=webapp:webapp public/*.* public/
 
 RUN \
