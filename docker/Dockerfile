@@ -66,14 +66,16 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,s
   echo " ===> Upgrading bundler" && \
   gem install bundler --silent && \
   echo " ===> Configuring bundler" && \
-  bundle_without=$(ruby -e "puts (File.read('Gemfile').scan(/^\s*group\s*[^#]*do/).join(' ').scan(/:(\w+)/).flatten.uniq - %w[staging production]).join(':')") && \
-  bundle config set --local without "$bundle_without" && \
   bundle config set --local jobs 8 && \
-  bundle config set --local deployment true && \
+  bundle config unset --local deployment && \
+  bundle config set --local path vendor/bundle && \
   bundle config set --local clean true && \
   export MAKE="make --jobs 8" && \
+  echo " ===> Removing unused groups from Gemfile" && \
+  perl -i -0pe 's/\ngroup((?!:staging|:production).)*? do.*?\n\s*end\s*/\n/sg' Gemfile && \
   echo " ===> Running bundle install" && \
   bundle install --quiet && \
+  bundle config set --local deployment true && \
   echo " ===> Copying bundle" && \
   mkdir -p ~/build && \
   (tar -cf - --exclude 'vendor/bundle/ruby/2.7.0/cache' Gemfile Gemfile.lock .bundle vendor/bundle | tar -xC ~/build)
@@ -112,7 +114,7 @@ ENV SECRET_KEY_BASE="none"
 ENV DEVISE_SECRET_KEY="none"
 ENV ENCRYPTION_KEY="123456044debc6f6c43f856bbb12e9c5070c33c63510586e30a4c60c3ecadb26"
 
-RUN cd ~/cashanalytics; mkdir -p node_modules/.cache tmp/cache/assets tmp/cache/webpacker/babel-loader-node-modules
+RUN mkdir -p node_modules/.cache tmp/cache/assets tmp/cache/webpacker/babel-loader-node-modules
 RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.cache,sharing=locked \
     --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/tmp/cache/assets,sharing=locked \
     --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/tmp/cache/webpacker/babel-loader-node-modules,sharing=locked \

@@ -40,7 +40,7 @@ def write_build_info
 end
 
 def docker_build
-  `docker/build.sh`
+  puts `docker/build.sh`
 end
 
 def copy_app
