@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm \
   echo ' ===> Installing Ruby dependencies' && \
   yum -y -q install openssl openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel ncurses-devel gmp-devel \
-                    postgresql10-devel libsodium && \
+                    postgresql-devel libsodium && \
   echo ' ===> Installing nodejs/yarn' && \
   yum -y -q install nodejs yarn
 
