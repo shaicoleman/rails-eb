@@ -69,6 +69,8 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,s
   bundle config set jobs 8 && \
   bundle config set clean true && \
   bundle config set deployment true && \
+  bundle_without=$(ruby -e "puts (File.read('Gemfile').scan(/^\s*group\s*[^#]*do/).join(' ').scan(/:(\w+)/).flatten.uniq - %w[staging production]).join(':')") && \
+  bundle config set without "$bundle_without" && \
   echo " ===> Running bundle install" && \
   export MAKE="make --jobs 8" && \
   bundle install --quiet && \
