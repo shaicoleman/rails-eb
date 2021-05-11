@@ -86,10 +86,8 @@ COPY --chown=webapp:webapp package.json yarn.lock .npmrc /var/app/staging
 RUN mkdir -p ~/.cache/yarn /var/app/staging/node_modules
 RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.cache/yarn,sharing=locked \
     --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules,sharing=locked \
-  echo " ===> Removing devDependencies from packages.json" && \
-  perl -i -0pe "s/,\s+\"devDependencies[^}]+}//" package.json && \
   echo " ===> yarn install" && \
-  yarn install --silent --frozen-lockfile --non-interactive && \
+  yarn install --silent --frozen-lockfile --non-interactive --production && \
   yarn autoclean && \
   echo " ===> Copying node_modules" && \
   mkdir -p ~/build && \
