@@ -44,6 +44,7 @@ _meta/
 vendor/cache/
 vendor/bundle/
 
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
