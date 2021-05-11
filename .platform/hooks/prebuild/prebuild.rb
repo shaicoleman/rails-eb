@@ -13,6 +13,7 @@ def main
   cleanup_yum_packages
   autoremove_yum_packages
   copy_files
+  create_symlinks
   run_handlers
   change_webapp_shell
   check_ruby_version
@@ -28,6 +29,10 @@ FILES = [
   { source: 'bin/rails-console', target: '/home/ec2-user/bin/rails-console' },
   { source: 'bin/rails-shell', target: '/home/ec2-user/bin/rails-shell' },
   { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' }
+]
+
+SYMLINKS = [
+  { source: '/usr/bin/vim', target: '/usr/local/sbin/vi' }
 ]
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
@@ -124,6 +129,15 @@ def copy_files
     FileUtils.cp(source, target)
     log("Copy: #{source} to #{target}")
     add_handler(file[:handler])
+  end
+end
+
+def create_symlinks
+  SYMLINKS.each do |symlink|
+    next if File.exist?(symlink[:target])
+
+    FileUtils.ln_s(symlink[:source], symlink[:target])
+    log("Symlink: #{symlink[:source]} to #{symlink[:target]}")
   end
 end
 
