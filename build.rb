@@ -13,6 +13,7 @@ def main
   write_build_info
   docker_build
   copy_app
+  add_metadata
 end
 
 def configure_elastic_beanstalk
@@ -46,6 +47,10 @@ def copy_app
   container_id = `docker create --rm al2`.chomp
   `docker cp #{container_id}:/home/webapp/build/app.zip .build/app.zip`
   `docker rm #{container_id}`
+end
+
+def add_metadata
+  `zip -r .build/app.zip _meta .platform`
 end
 
 main

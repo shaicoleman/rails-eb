@@ -128,11 +128,6 @@ RUN \
   mkdir -p ~/build && \
   7za -bd -snl -mm=Deflate -xr!node_modules -xr!log/* a ~/build/app.zip
 
-COPY --chown=webapp:webapp .platform .platform/
-COPY --chown=webapp:webapp _meta _meta/
-RUN \
-  7za -bd -snl -mm=Deflate a ~/build/app.zip _meta .platform
-
 # RUN \
 #   cd ~/cashanalytics && \
 #   echo " ===> Cleaning up" && \
