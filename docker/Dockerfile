@@ -62,7 +62,7 @@ COPY --chown=webapp:webapp Gemfile Gemfile.lock /var/app/staging
 
 RUN mkdir -p /var/app/staging/vendor/bundle
 RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,sharing=locked \
-  PATH="$HOME/.gem/ruby/2.7.0/bin:$PATH" && \
+  PATH="$HOME/.local/share/gem/ruby/2.7.0/bin:$PATH" && \
   echo " ===> Upgrading bundler" && \
   gem install bundler && \
   echo " ===> Configuring bundler" && \
@@ -109,7 +109,6 @@ ENV NODE_ENV=production
 ENV SECRET_KEY_BASE="none"
 ENV DEVISE_SECRET_KEY="none"
 ENV ENCRYPTION_KEY="123456044debc6f6c43f856bbb12e9c5070c33c63510586e30a4c60c3ecadb26"
-ENV PATH="$HOME/.gem/ruby/2.7.0/bin:$PATH"
 
 RUN cd ~/cashanalytics; mkdir -p node_modules/.cache tmp/cache/assets tmp/cache/webpacker/babel-loader-node-modules
 RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.cache,sharing=locked \
