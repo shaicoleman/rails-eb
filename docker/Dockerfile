@@ -122,12 +122,16 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.c
     bin/rails assets:precompile
 
 COPY --chown=webapp:webapp yarn.lock Procfile cron.yaml .
-COPY --chown=webapp:webapp .platform .platform/
 COPY --chown=webapp:webapp public/*.* public/
 
 RUN \
   mkdir -p ~/build && \
   7za -bd -snl -mm=Deflate -xr!node_modules -xr!log/* a ~/build/app.zip
+
+COPY --chown=webapp:webapp .platform .platform/
+COPY --chown=webapp:webapp _meta _meta/
+RUN \
+  7za -bd -snl -mm=Deflate a ~/build/app.zip _meta .platform
 
 # RUN \
 #   cd ~/cashanalytics && \
