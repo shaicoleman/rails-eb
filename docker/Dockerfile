@@ -65,8 +65,6 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,s
   PATH="$HOME/.gem/ruby/2.7.0/bin:$PATH" && \
   echo " ===> Upgrading bundler" && \
   gem install bundler && \
-  echo " ===> Removing unused groups from Gemfile" && \
-  perl -i -0pe "s/\ngroup((?!staging|production).)*? do.*?\n\s*end\s*/\n/sg" Gemfile && \
   echo " ===> Configuring bundler" && \
   bundle config set jobs 8 && \
   bundle config set clean true && \
