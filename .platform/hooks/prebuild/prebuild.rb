@@ -48,6 +48,7 @@ YUM_PACKAGES = [
   { package: 'strace', creates: '/usr/bin/strace' },
   { package: 'the_silver_searcher', creates: '/usr/bin/ag' },
   { package: 'ncdu', creates: '/usr/bin/ncdu' },
+  { package: 'mc', creates: '/usr/bin/mc' },
   { package: 'nodejs', creates: '/usr/bin/node' },
   { package: 'yarn', creates: '/usr/bin/yarn' },
   { package: 'postgresql', creates: '/usr/share/doc/postgresql-10.*' },
