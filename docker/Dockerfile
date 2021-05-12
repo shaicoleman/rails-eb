@@ -61,22 +61,22 @@ FROM app-base AS ruby-bundle
 RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/local/share/gem/ruby/2.7.0/cache,sharing=locked \
   PATH="$HOME/.local/share/gem/ruby/2.7.0/bin:$PATH" && \
   echo " ===> Upgrading bundler" && \
-  gem install bundler --silent
+  gem install bundler --silent && \
+  echo " ===> Configuring bundler" && \
+  bundle config unset --local deployment && \
+  bundle config set --local jobs 8 && \
+  bundle config set --local path vendor/bundle && \
+  bundle config set --local clean true
 
 COPY --chown=webapp:webapp Gemfile Gemfile.lock /var/app/staging
 
 RUN mkdir -p /var/app/staging/vendor/bundle
 RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,sharing=locked \
   PATH="$HOME/.local/share/gem/ruby/2.7.0/bin:$PATH" && \
-  echo " ===> Configuring bundler" && \
-  bundle config unset --local deployment && \
-  bundle config set --local jobs 8 && \
-  bundle config set --local path vendor/bundle && \
-  bundle config set --local clean true && \
-  export MAKE="make --jobs 8" && \
   echo " ===> Removing unused groups from Gemfile" && \
   perl -i -0pe 's/\ngroup((?!:staging|:production).)*? do.*?\n\s*end\s*/\n/sg' Gemfile && \
   echo " ===> Running bundle install" && \
+  export MAKE="make --jobs 8" && \
   bundle install --quiet && \
   bundle config set --local deployment true && \
   echo " ===> Copying bundle" && \
