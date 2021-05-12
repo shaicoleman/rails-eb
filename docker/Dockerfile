@@ -66,8 +66,8 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,s
   echo " ===> Upgrading bundler" && \
   gem install bundler --silent && \
   echo " ===> Configuring bundler" && \
-  bundle config set --local jobs 8 && \
   bundle config unset --local deployment && \
+  bundle config set --local jobs 8 && \
   bundle config set --local path vendor/bundle && \
   bundle config set --local clean true && \
   export MAKE="make --jobs 8" && \
