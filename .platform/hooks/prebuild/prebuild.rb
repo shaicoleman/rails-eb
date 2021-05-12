@@ -130,7 +130,11 @@ def copy_files
   FILES.each do |file|
     source = "#{__dir__}/files/#{file[:source]}"
     target = file[:target]
-    next if File.exist?(target) && FileUtils.compare_file(source, target)
+    bak_file = "#{target}.original"
+    if File.exist?(target)
+      next if FileUtils.compare_file(source, target)
+      FileUtils.cp(target, bak_file) unless File.exist?(bak_file)
+    end
 
     FileUtils.mkdir_p(File.dirname(target))
     FileUtils.cp(source, target)
