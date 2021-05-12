@@ -3,4 +3,7 @@ Rails.application.routes.draw do
   root :to => 'home#index'
 
   resources :uploads, only: [:new, :create]
+
+  get '/debug/trigger_error'
+  match '/debug/request' => 'debug#debug_request', via: :all  
 end
