@@ -8,6 +8,6 @@ $(ec2-metadata --instance-id --local-ipv4 --public-ipv4)
 eb_env: $(/opt/elasticbeanstalk/bin/get-config container --key 'environment_name')
 deploy_env: ${DEPLOY_ENV}
 
-$(cat /var/app/current/_meta/build-info.txt 2>/dev/null)
+$(cat /var/app/current/.build/build-info.txt 2>/dev/null)
 
 EOF
