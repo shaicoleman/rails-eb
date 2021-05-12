@@ -24,13 +24,17 @@ end
 FILES = [
   { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', handler: 'update_motd' },
   { source: 'profile.d/prompt.sh', target: '/etc/profile.d/prompt.sh' },
-  { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
   { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
   { source: 'bin/rails-console', target: '/home/ec2-user/bin/rails-console' },
   { source: 'bin/rails-shell', target: '/home/ec2-user/bin/rails-shell' },
   { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
+
+  { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
   { source: 'nginx/nginx.conf', target: '/opt/elasticbeanstalk/config/private/nginx/nginx.conf.template' },
-  { source: 'nginx/webapp.conf', target: '/opt/elasticbeanstalk/config/private/nginx/webapp.conf' }
+  { source: 'nginx/webapp.conf', target: '/opt/elasticbeanstalk/config/private/nginx/webapp.conf' },
+  { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/opt/elasticbeanstalk/config/private/nginx/elasticbeanstalk-nginx-ruby-upstream.conf' },
+  { source: 'nginx/healthd.conf', target: '/opt/elasticbeanstalk/config/private/healthd/healthd_nginx.conf' },
+  { source: 'nginx/healthd_logformat.conf', target: '/opt/elasticbeanstalk/config/private/healthd/healthd_logformat.conf' }
 ]
 
 SYMLINKS = [
