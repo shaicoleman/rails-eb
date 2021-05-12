@@ -56,7 +56,7 @@ YUM_PACKAGES = [
   { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
   { package: FILE_LIBS_URL, creates: '/usr/share/doc/file-libs-5.39' },
   { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' },
-  { package: DEEPSECURITY_URL, creates: '/opt/ds_agent/ds_agent' }
+  # { package: DEEPSECURITY_URL, creates: '/opt/ds_agent/ds_agent' }
 ]
 
 YUM_CLEANUP = [
