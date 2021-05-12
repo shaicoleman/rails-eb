@@ -39,7 +39,6 @@
 yarn-debug.log*
 .yarn-integrity
 
-_meta/
 .build/
 vendor/cache/
 vendor/bundle/
