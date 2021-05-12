@@ -28,7 +28,9 @@ FILES = [
   { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
   { source: 'bin/rails-console', target: '/home/ec2-user/bin/rails-console' },
   { source: 'bin/rails-shell', target: '/home/ec2-user/bin/rails-shell' },
-  { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' }
+  { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
+  { source: 'nginx/nginx.conf', target: '/opt/elasticbeanstalk/config/private/nginx/nginx.conf.template' },
+  { source: 'nginx/webapp.conf', target: '/opt/elasticbeanstalk/config/private/nginx/webapp.conf' }
 ]
 
 SYMLINKS = [
