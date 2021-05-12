@@ -13,4 +13,14 @@ class DebugController < ApplicationController
                    params: params.except(:controller, :action, :debug),
                    body: request.body }
   end
+
+  def instance_id
+    instance_id = `ec2-metadata --instance-id || true`.chomp.presence
+    render json: { instance_id: instance_id }
+  end
+
+  def build_info
+    build_info = File.read('./.build/build-info.txt').scan(/^([^:]+): (.*)$/).to_h        
+    render json: { build_info: build_info }
+  end
 end
