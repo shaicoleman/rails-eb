@@ -24,8 +24,8 @@ def configure_elastic_beanstalk
 end
 
 def clean_old_build
-  FileUtils.rm_rf(%w[_meta .build])
-  FileUtils.mkdir_p(%w[_meta .build])
+  FileUtils.rm_rf('.build')
+  FileUtils.mkdir_p('.build')
 end
 
 def write_build_info
@@ -36,7 +36,7 @@ def write_build_info
     User: #{`whoami`.chomp}
     Time: #{Time.now.utc.iso8601}
   EOT
-  File.write('_meta/build-info.txt', build_info)
+  File.write('.build/build-info.txt', build_info)
 end
 
 def docker_build
@@ -50,7 +50,7 @@ def copy_app
 end
 
 def add_metadata
-  `zip -r .build/app.zip _meta .platform`
+  `zip -r .build/app.zip .build/build-info.txt .platform`
 end
 
 main
