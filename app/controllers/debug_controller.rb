@@ -15,7 +15,7 @@ class DebugController < ApplicationController
   end
 
   def instance_id
-    instance_id = `ec2-metadata --instance-id || true`.chomp.presence
+    instance_id = `ec2-metadata --instance-id || true`.match(/(i-[0-9a-z]+)/)&.captures&.first
     render json: { instance_id: instance_id }
   end
 
