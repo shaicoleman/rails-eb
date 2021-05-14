@@ -12,6 +12,7 @@ def main
   install_yum_packages
   cleanup_yum_packages
   autoremove_yum_packages
+  decompress_app
   copy_files
   create_symlinks
   run_handlers
@@ -125,6 +126,13 @@ def upgrade_bundler
   return if Gem::Version.new(installed_version) >= Gem::Version.new(gemfile_version)
 
   run('gem install bundler')
+end
+
+def decompress_app
+  return unless File.exist?('.build/app.tar.zst')
+
+  run('tar -I zstd -xf .build/app.tar.zst')
+  FileUtils.rm_f('.build/app.tar.zst')
 end
 
 def copy_files

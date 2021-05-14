@@ -45,12 +45,12 @@ end
 
 def copy_app
   container_id = `docker create --rm al2`.chomp
-  `docker cp #{container_id}:/home/webapp/build/app.zip .build/app.zip`
+  `docker cp #{container_id}:/home/webapp/build/app.tar.zst .build/app.tar.zst`
   `docker rm #{container_id}`
 end
 
 def add_metadata
-  `zip -r .build/app.zip .build/build-info.txt .platform`
+  `zip -r .build/app.zip -n zst .build/app.tar.zst .build/build-info.txt .platform`
 end
 
 main

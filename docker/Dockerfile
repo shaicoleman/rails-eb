@@ -128,7 +128,7 @@ COPY --chown=webapp:webapp public/*.* public/
 
 RUN \
   mkdir -p ~/build && \
-  7za -bd -snl -mm=Deflate -xr!node_modules -xr!log/* a ~/build/app.zip
+  tar -c --exclude=node_modules --exclude=log . | zstd -11 > ~/build/app.tar.zst
 
 # RUN \
 #   cd ~/cashanalytics && \
