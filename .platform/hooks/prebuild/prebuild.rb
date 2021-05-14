@@ -57,6 +57,7 @@ YUM_PACKAGES = [
   { package: 'mc', creates: '/usr/bin/mc' },
   { package: 'nodejs', creates: '/usr/bin/node' },
   { package: 'yarn', creates: '/usr/bin/yarn' },
+  { package: 'zstd', creates: '/usr/bin/zstd' },
   { package: 'postgresql', creates: '/usr/share/doc/postgresql-10.*' },
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },

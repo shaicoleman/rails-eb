@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
   echo ' ===> Installing development tools' && \
-  yum -y -q install gcc gcc-c++ git autoconf automake bzip2 make libtool which p7zip xz tar \
+  yum -y -q install gcc gcc-c++ git autoconf automake make libtool which p7zip tar zstd \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm \
   echo ' ===> Installing Ruby dependencies' && \
@@ -36,7 +36,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 FROM al2-dev AS ruby
 RUN \
   mkdir -p /opt/rubies && \
-  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/ruby/ruby-2.7.3.tar.xz | tar xJ -C /opt/rubies
+  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/ruby/ruby-2.7.3.tar.zst | tar x -I zstd -C /opt/rubies
 
 # ### app-base
 FROM al2-dev AS app-base
