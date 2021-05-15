@@ -50,7 +50,7 @@ def copy_app
 end
 
 def add_metadata
-  `zip -r .build/app.zip -n zst .build/app.tar.zst .build/build-info.txt .platform`
+  `zip -r .build/app.zip -n zst .build/app.tar.zst .build/build-info.txt .platform Procfile cron.yaml`
 end
 
 main

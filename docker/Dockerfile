@@ -125,7 +125,6 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.c
     rm -f bin/yarn && \
     bin/rails assets:precompile
 
-COPY --chown=webapp:webapp Procfile cron.yaml .
 COPY --chown=webapp:webapp public/*.* public/
 
 RUN \
