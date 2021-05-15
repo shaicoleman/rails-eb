@@ -13,7 +13,7 @@ def main
   cleanup_yum_packages
   autoremove_yum_packages
   install_zstd
-  decompress_app
+  extract_app
   copy_files
   create_symlinks
   run_handlers
@@ -135,7 +135,7 @@ def upgrade_bundler
   run('gem install bundler')
 end
 
-def decompress_app
+def extract_app
   return unless File.exist?('.build/app.tar.zst')
 
   run('zstdcat .build/app.tar.zst | tar -x')
