@@ -51,12 +51,13 @@ EATMYDATA_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/eatmydata/libea
 FILE_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm'
 FILE_LIBS_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm'
 WKHTMLTOPDF_RPM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/wkhtmltopdf/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm'
+TMUX_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/tmux/tmux-3.1c-2.amzn2.x86_64.rpm'
 DEEPSECURITY_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity/Agent-PGPCore-amzn2-20.0.0-2204.x86_64.rpm'
 
 YUM_PACKAGES = [
   { package: 'htop', creates: '/usr/bin/htop' },
+  { package: 'iotop', creates: '/usr/sbin/iotop' },
   { package: 'strace', creates: '/usr/bin/strace' },
-  { package: 'tmux', creates: '/usr/bin/tmux' },
   { package: 'the_silver_searcher', creates: '/usr/bin/ag' },
   { package: 'ncdu', creates: '/usr/bin/ncdu' },
   { package: 'mc', creates: '/usr/bin/mc' },
@@ -66,6 +67,7 @@ YUM_PACKAGES = [
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
   { package: FILE_LIBS_URL, creates: '/usr/share/doc/file-libs-5.39' },
+  { package: TMUX_URL, creates: '/usr/bin/tmux' },
   { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' },
   # { package: DEEPSECURITY_URL, creates: '/opt/ds_agent/ds_agent' }
 ]
