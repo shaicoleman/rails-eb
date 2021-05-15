@@ -8,6 +8,7 @@ def main
   init
   enable_eatmydata
   enable_swap
+  nonblocking_dev_random  
   install_repos
   install_yum_packages
   cleanup_yum_packages
@@ -76,7 +77,7 @@ YUM_CLEANUP = [
   { package: 'xfs*', removes: '/sbin/xfsdump' },
   { package: 'hunspell*', removes: '/bin/hunspell' },
   { package: 'tcsh', removes: '/bin/tcsh' },
-  { package: 'rng-tools', removes: '/usr/sbin/rngd' },
+  { package: 'rng-tools', removes: '/usr/sbin/rngd' }
 ]
 
 def enable_swap
@@ -85,6 +86,13 @@ def enable_swap
   total_ram_kb = `cat /proc/meminfo`.match(/^MemTotal:\s+(\d+) kB/)&.captures.first&.to_i
   swap_size_kb = [total_ram_kb * 0.25, 1048576].max.ceil
   run("fallocate -l #{swap_size_kb}K /swapfile; mkswap -f /swapfile; chmod 600 /swapfile; swapon /swapfile")
+end
+
+# Not necessary for kernel >= 5.6
+def nonblocking_dev_random
+  return if File.stat('/dev/random').rdev_minor == 9
+
+  run('rm /dev/random; sudo mknod -m 666 /dev/random c 1 9')
 end
 
 # Only enabled on first run
