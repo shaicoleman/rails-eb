@@ -12,6 +12,7 @@ def main
   install_yum_packages
   cleanup_yum_packages
   autoremove_yum_packages
+  install_zstd
   decompress_app
   copy_files
   create_symlinks
@@ -39,7 +40,7 @@ FILES = [
 ]
 
 SYMLINKS = [
-  { source: '/usr/bin/vim', target: '/usr/local/sbin/vi' }
+  { source: '/usr/bin/vim', target: '/usr/local/bin/vi' }
 ]
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
@@ -58,7 +59,6 @@ YUM_PACKAGES = [
   { package: 'mc', creates: '/usr/bin/mc' },
   { package: 'nodejs', creates: '/usr/bin/node' },
   { package: 'yarn', creates: '/usr/bin/yarn' },
-  { package: 'zstd', creates: '/usr/bin/zstd' },
   { package: 'postgresql', creates: '/usr/share/doc/postgresql-10.*' },
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
   { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
@@ -98,6 +98,12 @@ def install_repos
   install_epel_repo
   install_nodejs_repo
   install_yarn_repo
+end
+
+def install_zstd
+  return if File.exist?('/usr/local/bin/zstd')
+
+  `curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/zstd/zstd-1.5.0.tar.xz | tar -xJ -C /`
 end
 
 def init
