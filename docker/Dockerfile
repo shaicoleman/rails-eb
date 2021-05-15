@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
   echo ' ===> Installing development tools' && \
-  yum -y -q install gcc gcc-c++ git autoconf automake make libtool which p7zip tar zstd \
+  yum -y -q install gcc gcc-c++ git autoconf automake make libtool which tar zstd \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm \
   echo ' ===> Installing Ruby dependencies' && \
