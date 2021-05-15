@@ -26,6 +26,7 @@ end
 FILES = [
   { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', handler: 'update_motd' },
   { source: 'profile.d/prompt.sh', target: '/etc/profile.d/prompt.sh' },
+  { source: 'profile.d/path.sh', target: '/etc/profile.d/path.sh' },
   { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
   { source: 'bin/rails', target: '/home/ec2-user/bin/rails' },
   { source: 'bin/webapp', target: '/home/ec2-user/bin/webapp' },
