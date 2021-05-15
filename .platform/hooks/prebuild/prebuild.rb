@@ -11,7 +11,6 @@ def main
   install_repos
   install_yum_packages
   cleanup_yum_packages
-  autoremove_yum_packages
   install_zstd
   extract_app
   copy_files
@@ -203,7 +202,7 @@ def cleanup_yum_packages
                           .map { |item| item[:package] }
   return if to_cleanup.empty?
 
-  run("yum -y erase #{to_cleanup.join(' ')}")
+  run("yum -y autoremove #{to_cleanup.join(' ')}")
 end
 
 def install_yum_packages
