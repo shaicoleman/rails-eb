@@ -32,13 +32,13 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
   echo ' ===> Installing nodejs/yarn' && \
   yum -y -q install nodejs yarn && \
   echo ' ===> Installing zstd' && \
-  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/zstd/zstd-1.5.0.tar.xz | tar -xJ -C /
+  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/zstd/zstd-1.5.0.tar.xz | tar -xJC /
 
 ### ruby
 FROM al2-dev AS ruby
 RUN \
   mkdir -p /opt/rubies && \
-  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/ruby/ruby-2.7.3.tar.zst | zstdcat | tar -C /opt/rubies -x
+  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/ruby/ruby-2.7.3.tar.zst | zstdcat | tar -xC /
 
 # ### app-base
 FROM al2-dev AS app-base
