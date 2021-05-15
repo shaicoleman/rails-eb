@@ -17,20 +17,22 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
   echo ' ===> Configuring EPEL repo' && \
   yum -y -q install epel-release && \
   echo ' ===> Configuring Node repo' && \
-  (curl -sL https://rpm.nodesource.com/setup_14.x | bash -) && \
+  (curl -sSL https://rpm.nodesource.com/setup_14.x | bash -) && \
   echo ' ===> Configuring Yarn repo' && \
-  (curl -sL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo)
+  (curl -sSL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo)
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
   echo ' ===> Installing development tools' && \
-  yum -y -q install gcc gcc-c++ git autoconf automake make libtool which tar zstd \
+  yum -y -q install gcc gcc-c++ git autoconf automake make libtool which tar \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm \
   echo ' ===> Installing Ruby dependencies' && \
   yum -y -q install openssl openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel ncurses-devel gmp-devel \
                     postgresql-devel libsodium && \
   echo ' ===> Installing nodejs/yarn' && \
-  yum -y -q install nodejs yarn
+  yum -y -q install nodejs yarn && \
+  echo ' ===> Installing zstd' && \
+  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/zstd/zstd-1.5.0.tar.gz | tar -xz -C /
 
 ### ruby
 FROM al2-dev AS ruby
