@@ -56,6 +56,7 @@ DEEPSECURITY_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity
 YUM_PACKAGES = [
   { package: 'htop', creates: '/usr/bin/htop' },
   { package: 'strace', creates: '/usr/bin/strace' },
+  { package: 'tmux', creates: '/usr/bin/tmux' },
   { package: 'the_silver_searcher', creates: '/usr/bin/ag' },
   { package: 'ncdu', creates: '/usr/bin/ncdu' },
   { package: 'mc', creates: '/usr/bin/mc' },
