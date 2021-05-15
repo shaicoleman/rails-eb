@@ -147,7 +147,7 @@ def copy_files
   FILES.each do |file|
     source = "#{__dir__}/files/#{file[:source]}"
     target = file[:target]
-    bak_file = "#{target}.original"
+    bak_file = "#{target}.old"
     if File.exist?(target)
       next if FileUtils.compare_file(source, target)
       FileUtils.cp(target, bak_file) unless File.exist?(bak_file)
