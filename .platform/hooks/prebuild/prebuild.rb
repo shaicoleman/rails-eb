@@ -131,7 +131,7 @@ end
 def decompress_app
   return unless File.exist?('.build/app.tar.zst')
 
-  run('tar -I zstd -xf .build/app.tar.zst')
+  run('zstdcat .build/app.tar.zst | tar -x')
   FileUtils.rm_f('.build/app.tar.zst')
 end
 

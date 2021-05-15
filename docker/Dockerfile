@@ -36,7 +36,7 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
 FROM al2-dev AS ruby
 RUN \
   mkdir -p /opt/rubies && \
-  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/ruby/ruby-2.7.3.tar.zst | tar x -I zstd -C /opt/rubies
+  curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/ruby/ruby-2.7.3.tar.zst | zstdcat | tar -C /opt/rubies -x
 
 # ### app-base
 FROM al2-dev AS app-base
@@ -128,7 +128,7 @@ COPY --chown=webapp:webapp public/*.* public/
 
 RUN \
   mkdir -p ~/build && \
-  tar -c --exclude=node_modules --exclude=log . | zstd -11 > ~/build/app.tar.zst
+  tar -c --exclude=node_modules --exclude=log/* . | zstd -T0 -11 > ~/build/app.tar.zst
 
 # RUN \
 #   cd ~/cashanalytics && \
