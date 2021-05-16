@@ -172,9 +172,9 @@ end
 
 def create_symlinks
   SYMLINKS.each do |symlink|
-    next if File.exist?(symlink[:target])
+    next if File.symlink?(symlink[:target]) && File.realpath(symlink[:source]) == File.realpath(symlink[:target])
 
-    FileUtils.ln_s(symlink[:source], symlink[:target])
+    FileUtils.ln_sf(symlink[:source], symlink[:target])
     log("Symlink: #{symlink[:source]} to #{symlink[:target]}")
   end
 end
