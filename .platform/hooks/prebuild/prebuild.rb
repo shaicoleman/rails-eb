@@ -77,7 +77,6 @@ YUM_CLEANUP = [
   { package: 'ImageMagick*', removes: '/usr/bin/Magick-config' },
   { package: 'postgres*-9*', removes: '/usr/share/doc/postgresql-9*' },
   { package: 'iptables*', removes: '/sbin/iptables' },
-  { package: 'xfs*', removes: '/sbin/xfsdump' },
   { package: 'hunspell*', removes: '/bin/hunspell' },
   { package: 'tcsh', removes: '/bin/tcsh' },
   { package: 'rng-tools', removes: '/usr/sbin/rngd' }
