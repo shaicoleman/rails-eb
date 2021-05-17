@@ -24,7 +24,7 @@ def main
 end
 
 FILES = [
-  { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', handler: 'update_motd' },
+  { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', handler: 'update_motd', no_backup: true },
   { source: 'profile.d/profile.sh', target: '/etc/profile.d/profile.sh' },
   { source: 'profile.d/prompt.sh', target: '/etc/profile.d/prompt.sh' },
   { source: 'profile.d/rbenv.sh', target: '/etc/profile.d/rbenv.sh' },
@@ -162,7 +162,7 @@ def copy_files
     bak_file = "#{target}.old"
     if File.exist?(target)
       next if FileUtils.compare_file(source, target)
-      FileUtils.cp(target, bak_file) unless File.exist?(bak_file)
+      FileUtils.cp(target, bak_file) unless file[:no_backup] || File.exist?(bak_file)
     end
 
     FileUtils.mkdir_p(File.dirname(target))
