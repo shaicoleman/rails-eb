@@ -34,15 +34,17 @@ FILES = [
   { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
 
   { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
-  { source: 'nginx/nginx.conf', target: '/opt/elasticbeanstalk/config/private/nginx/nginx.conf.template' },
-  { source: 'nginx/webapp.conf', target: '/opt/elasticbeanstalk/config/private/nginx/webapp.conf' },
-  { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/opt/elasticbeanstalk/config/private/nginx/elasticbeanstalk-nginx-ruby-upstream.conf' },
-  { source: 'nginx/healthd.conf', target: '/opt/elasticbeanstalk/config/private/healthd/healthd_nginx.conf' },
-  { source: 'nginx/healthd_logformat.conf', target: '/opt/elasticbeanstalk/config/private/healthd/healthd_logformat.conf' }
+  { source: 'nginx/nginx.conf', target: '/etc/nginx/nginx.conf' },
+  { source: 'nginx/gzip.conf', target: '/etc/nginx/conf.d/gzip.conf' },
+  { source: 'nginx/webapp.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/webapp.conf' },
+  { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/etc/nginx/conf.d/elasticbeanstalk-nginx-ruby-upstream.conf' },
+  { source: 'nginx/healthd.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/healthd.conf' },
+  { source: 'nginx/healthd_logformat.conf', target: '/etc/nginx/conf.d/healthd_logformat.conf' }
 ]
 
 SYMLINKS = [
-  { source: '/usr/bin/vim', target: '/usr/local/bin/vi' }
+  { source: '/usr/bin/vim', target: '/usr/local/bin/vi' },
+  { source: '/etc/nginx', target: '/var/app/staging/.platform/nginx' } # Prevent /etc/nginx from being overwritten
 ]
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
