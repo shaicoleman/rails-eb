@@ -3,6 +3,12 @@ class DebugController < ApplicationController
     raise 'Test error'
   end
 
+  def debug_sleep
+    seconds = params[:seconds].presence&.to_f || 1.0
+    sleep seconds
+    render json: { sleep: seconds }
+  end
+
   def debug_request
     headers = self.request.env.filter_map do |k, v|
       next unless k.match?(/^HTTP_/) && !k.match?(/^HTTP_(VERSION|X_FORWARD|X_AMZN|X_REAL_IP|COOKIE)/)
