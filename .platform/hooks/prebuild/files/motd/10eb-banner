@@ -1,14 +1,32 @@
-#!/bin/sh
-cat << EOF
+#!/opt/elasticbeanstalk/lib/ruby/bin/ruby
+# frozen_string_literal: true
+
+require 'time'
+
+ec2_metadata = `ec2-metadata --instance-id --public-ipv4`.scan(/^([a-z0-9_-]+): (.*)$/i).to_h
+launch_time = File.mtime('/opt/elasticbeanstalk/.aws-eb-system-bootstrapped').utc
+eb_env = `/opt/elasticbeanstalk/bin/get-config container --key 'environment_name'`
+deploy_env = ENV['DEPLOY_ENV']
+if File.exist?('/var/app/current/.build/build-info.txt')
+  build_info = File.read('/var/app/current/.build/build-info.txt').scan(/^([a-z0-9_-]+): (.*)$/i).to_h
+  build_time = Time.parse(build_info['Time']).utc
+  build_str = <<~EOT
+    Build: #{build_time} / #{build_info['User']}
+    Commit: #{build_info['Branch']} / #{build_info['Commit']} / #{build_info['Message']}
+  EOT
+end
+
+msg = <<~EOT
 
 ###  WARNING: UNAUTHORIZED ACCESS TO THIS SYSTEM IS PROHIBITED  ###
 ###  All activities on this system are logged and monitored     ###
 
-$(ec2-metadata --instance-id --local-ipv4 --public-ipv4)
-launch_time: $(date --utc +%Y-%m-%dT%H:%M:%SZ -r /opt/elasticbeanstalk/.aws-eb-system-bootstrapped)
-eb_env: $(/opt/elasticbeanstalk/bin/get-config container --key 'environment_name')
-deploy_env: ${DEPLOY_ENV}
+Instance: #{ec2_metadata['instance-id']}
+Launch time: #{launch_time}
+Public IPv4: #{ec2_metadata['public-ipv4']}
+EB environment: #{eb_env}
+Deploy environment: #{deploy_env}
+#{build_str}
+EOT
 
-$(cat /var/app/current/.build/build-info.txt 2>/dev/null)
-
-EOF
+puts msg
