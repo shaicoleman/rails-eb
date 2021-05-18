@@ -5,6 +5,7 @@ cat << EOF
 ###  All activities on this system are logged and monitored     ###
 
 $(ec2-metadata --instance-id --local-ipv4 --public-ipv4)
+launch_time: $(date --utc +%Y-%m-%dT%H:%M:%SZ -r /opt/elasticbeanstalk/.aws-eb-system-bootstrapped)
 eb_env: $(/opt/elasticbeanstalk/bin/get-config container --key 'environment_name')
 deploy_env: ${DEPLOY_ENV}
 
