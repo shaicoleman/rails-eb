@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MiddlewareBypass
+class RawRequestHandler
   def initialize(app)
     @app = app
   end
@@ -12,4 +12,4 @@ class MiddlewareBypass
   end
 end
 
-Rails.application.middleware.insert 0, MiddlewareBypass
+Rails.application.middleware.insert 0, RawRequestHandler
