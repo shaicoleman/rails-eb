@@ -32,6 +32,7 @@ FILES = [
   { source: 'bin/rails', target: '/home/ec2-user/bin/rails' },
   { source: 'bin/webapp', target: '/home/ec2-user/bin/webapp' },
   { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
+  { source: 'systemd/sshd.conf', target: '/etc/systemd/system/sshd.service.d/local.conf', handler: 'restart_sshd' },
 
   { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
   { source: 'nginx/nginx.conf', target: '/etc/nginx/nginx.conf' },
@@ -232,6 +233,10 @@ end
 
 def reload_sysctl
   run('sysctl -p /etc/sysctl.d/local.conf', ignore_errors: true)
+end
+
+def restart_sshd
+  run('systemctl daemon-reload; systemctl restart sshd')
 end
 
 def update_motd
