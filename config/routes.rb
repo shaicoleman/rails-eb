@@ -8,5 +8,6 @@ Rails.application.routes.draw do
   get '/debug/build_info'
   get '/debug/instance_id'
   get '/debug/sleep/:seconds', to: 'debug#debug_sleep', constraints: { seconds: /.*/ }
+  get '/debug/stress/:seconds', to: 'debug#stress', constraints: { seconds: /.*/ }  
   match '/debug/request' => 'debug#debug_request', via: :all  
 end

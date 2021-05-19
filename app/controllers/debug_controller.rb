@@ -3,6 +3,17 @@ class DebugController < ApplicationController
     raise 'Test error'
   end
 
+  def stress
+    seconds = params[:seconds].presence&.to_f || 1.0
+    stopwatch = Stopwatch.new
+    x = []
+    while stopwatch.elapsed < seconds do
+      x.unshift(SecureRandom.alphanumeric(64))
+      x.sort!
+    end
+    render json: { sleep: seconds }
+  end
+
   def debug_sleep
     seconds = params[:seconds].presence&.to_f || 1.0
     sleep seconds
