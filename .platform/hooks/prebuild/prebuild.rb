@@ -1,6 +1,7 @@
 #!/opt/elasticbeanstalk/lib/ruby/bin/ruby
 # frozen_string_literal: true
 
+require 'erb'
 require 'open3'
 require 'fileutils'
 
@@ -37,7 +38,7 @@ FILES = [
   { source: 'htop/htoprc', target: '/root/.config/htop/htoprc' },
 
   { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
-  { source: 'nginx/nginx.conf', target: '/etc/nginx/nginx.conf' },
+  { source: 'nginx/nginx.conf.erb', target: '/etc/nginx/nginx.conf', template: 'erb' },
   { source: 'nginx/gzip.conf', target: '/etc/nginx/conf.d/gzip.conf' },
   { source: 'nginx/webapp.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/webapp.conf' },
   { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/etc/nginx/conf.d/elasticbeanstalk-nginx-ruby-upstream.conf' },
@@ -161,6 +162,11 @@ end
 def copy_files
   FILES.each do |file|
     source = "#{__dir__}/files/#{file[:source]}"
+    if file[:template] == 'erb'
+      contents = ERB.new(File.read(source)).result
+      File.write('/tmp/erb', contents)
+      source = '/tmp/erb'
+    end
     target = file[:target]
     bak_file = "#{target}.old"
     if File.exist?(target)
@@ -172,6 +178,7 @@ def copy_files
     FileUtils.cp(source, target)
     log("Copy: #{source} to #{target}")
     add_handler(file[:handler])
+    FileUtils.rm_f('/tmp/erb') if File.exist?('/tmp/erb')
   end
 end
 
