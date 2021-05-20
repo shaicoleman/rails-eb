@@ -2,16 +2,23 @@
 # frozen_string_literal: true
 
 require 'time'
+require 'json'
 
 ec2_metadata = `ec2-metadata --instance-id --public-ipv4`.scan(/^([a-z0-9_-]+): (.*)$/i).to_h
 launch_time = File.mtime('/opt/elasticbeanstalk/.aws-eb-system-bootstrapped').utc
 eb_env = `/opt/elasticbeanstalk/bin/get-config container --key 'environment_name'`
 deploy_env = ENV['DEPLOY_ENV']
+
+if File.exist?('/opt/elasticbeanstalk/deployment/app_version_manifest.json')
+  app_version = JSON.parse(File.read('/opt/elasticbeanstalk/deployment/app_version_manifest.json'))
+  deployment_id = app_version['DeploymentId']
+end
+
 if File.exist?('/var/app/current/.build/build-info.txt')
   build_info = File.read('/var/app/current/.build/build-info.txt').scan(/^([a-z0-9_-]+): (.*)$/i).to_h
   build_time = Time.parse(build_info['Time']).utc
   build_str = <<~EOT
-    Build: #{build_time} / #{build_info['User']}
+    Build: #{deployment_id} / #{build_time} / #{build_info['User']}
     Commit: #{build_info['Branch']} / #{build_info['Commit']} / #{build_info['Message']}
   EOT
 end
