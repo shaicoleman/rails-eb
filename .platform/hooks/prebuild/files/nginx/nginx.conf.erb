@@ -1,6 +1,6 @@
-<% require 'net/http'
-mac = Net::HTTP.get(URI('http://169.254.169.254/latest/meta-data/network/interfaces/macs/')).match(/^([0-9a-f:]+)/)&.captures&.first
-vpc_cidr = Net::HTTP.get(URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/vpc-ipv4-cidr-block")).chomp
+<% require 'json'
+instance_data = JSON.parse(File.read('/run/cloud-init/instance-data.json'))
+vpc_cidr = instance_data.dig('ds', 'meta-data', 'network', 'interfaces', 'macs').values.dig(0, 'vpc-ipv4-cidr-block')
 %># Elastic Beanstalk Nginx Configuration File
 
 user                    nginx;
