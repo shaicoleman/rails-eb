@@ -2,3 +2,4 @@ export PATH="$HOME/.local/bin:$HOME/bin:/opt/elasticbeanstalk/.rbenv/shims:/opt/
 
 alias l='ls -Al'
 alias vi='vim'
+alias ncdu='ncdu --color=dark'
