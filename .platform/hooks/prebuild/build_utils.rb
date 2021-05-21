@@ -7,7 +7,6 @@ require 'fileutils'
 
 def copy_files
   FILES.each do |file|
-    log("Copy: #{file[:source]} to #{file[:target]}")
     source = "#{__dir__}/files/#{file[:source]}"
     if file[:template] == 'erb'
       contents = ERB.new(File.read(source)).result
@@ -20,11 +19,12 @@ def copy_files
       next if FileUtils.compare_file(source, target)
       FileUtils.cp(target, bak_file) unless file[:no_backup] || File.exist?(bak_file)
     end
-
+    
     FileUtils.mkdir_p(File.dirname(target))
     FileUtils.cp(source, target)
     add_handler(file[:handler])
     FileUtils.rm_f('/tmp/erb') if File.exist?('/tmp/erb')
+    log("Copy: #{file[:source]} to #{file[:target]}")
   end
 end
 
