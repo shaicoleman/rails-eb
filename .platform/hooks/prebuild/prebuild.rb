@@ -114,9 +114,9 @@ end
 
 def install_repos
   enable_amazon_linux_extras
-  install_epel_repo
   install_nodejs_repo
   install_yarn_repo
+  install_epel_repo
 end
 
 def install_zstd
