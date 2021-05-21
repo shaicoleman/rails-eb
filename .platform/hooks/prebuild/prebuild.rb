@@ -36,6 +36,7 @@ FILES = [
   { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
   { source: 'ssh/sshd_config', target: '/etc/ssh/sshd_config', handler: 'restart_sshd' },
   { source: 'ssh/sshd_service.conf', target: '/etc/systemd/system/sshd.service.d/sshd_service.conf', handler: 'restart_sshd' },
+  { source: 'chrony/chrony.conf', target: '/etc/chrony.conf', handler: 'restart_chronyd' },
   { source: 'htop/htoprc', target: '/root/.config/htop/htoprc' },
 
   { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
@@ -255,6 +256,10 @@ end
 
 def restart_sshd
   run('systemctl daemon-reload; sshd -t && systemctl restart sshd')
+end
+
+def restart_chronyd
+  run('systemctl restart chronyd')
 end
 
 def update_motd
