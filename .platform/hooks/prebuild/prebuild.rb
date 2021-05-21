@@ -50,7 +50,7 @@ FILES = [
 
 SYMLINKS = [
   { source: '/usr/bin/vim', target: '/usr/local/bin/vi' },
-  { source: '/etc/nginx', target: '/var/app/staging/.platform/nginx' } # Prevent /etc/nginx from being overwritten
+  { source: '/etc/nginx', target: '.platform/nginx' } # Prevent /etc/nginx from being overwritten  
 ]
 
 AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
