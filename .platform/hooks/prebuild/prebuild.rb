@@ -128,6 +128,7 @@ end
 
 def init
   abort 'Must be root' unless Process.uid == 0
+  Dir.chdir("#{__dir__}/../../..")  
   @handlers = []
 end
 
