@@ -51,13 +51,14 @@ SYMLINKS = [
   { source: '/etc/nginx', target: '.platform/nginx' } # Prevent /etc/nginx from being overwritten  
 ]
 
-AMAZON_LINUX_EXTRAS = %w[epel postgresql10]
+AMAZON_LINUX_EXTRAS = %w[postgresql10]
 
 EATMYDATA_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/eatmydata/libeatmydata-0.1-00.21.el7.centos.x86_64.rpm'
 FILE_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm'
 FILE_LIBS_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm'
 WKHTMLTOPDF_RPM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/wkhtmltopdf/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm'
 TMUX_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/tmux/tmux-3.1c-2.amzn2.x86_64.rpm'
+LIBSODIUM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/libsodium/libsodium-1.0.18-1.el7.x86_64.rpm',
 DEEPSECURITY_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity/Agent-PGPCore-amzn2-20.0.0-2204.x86_64.rpm'
 
 YUM_PACKAGES = [
@@ -70,7 +71,7 @@ YUM_PACKAGES = [
   { package: 'nodejs', creates: '/usr/bin/node' },
   { package: 'yarn', creates: '/usr/bin/yarn' },
   { package: 'postgresql', creates: '/usr/share/doc/postgresql-10.*' },
-  { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*' },
+  { package: LIBSODIUM_URL, creates: '/usr/lib64/libsodium.so.*' },
   { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
   { package: FILE_LIBS_URL, creates: '/usr/share/doc/file-libs-5.39' },
   { package: TMUX_URL, creates: '/usr/bin/tmux' },
@@ -116,7 +117,6 @@ def install_repos
   enable_amazon_linux_extras
   install_nodejs_repo
   install_yarn_repo
-  install_epel_repo
 end
 
 def install_zstd
@@ -165,12 +165,6 @@ def enable_amazon_linux_extras
   return if to_enable.empty?
 
   run("amazon-linux-extras enable #{to_enable.join(' ')}")
-end
-
-def install_epel_repo
-  return if File.exist?('/etc/yum.repos.d/epel.repo')
-
-  run('yum -y install epel-release')
 end
 
 def install_nodejs_repo
