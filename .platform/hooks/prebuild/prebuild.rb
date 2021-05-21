@@ -24,69 +24,71 @@ def main
 end
 
 FILES = [
+  { source: 'bin/rails', target: '/home/ec2-user/bin/rails' },
+  { source: 'bin/webapp', target: '/home/ec2-user/bin/webapp' },
+  { source: 'chrony/chrony.conf', target: '/etc/chrony.conf', handler: 'restart_chronyd' },
+  { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
+  { source: 'htop/htoprc', target: '/root/.config/htop/htoprc' },
   { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', handler: 'update_motd', no_backup: true },
   { source: 'profile.d/profile.sh', target: '/etc/profile.d/profile.sh' },
   { source: 'profile.d/prompt.sh', target: '/etc/profile.d/prompt.sh' },
   { source: 'profile.d/rbenv.sh', target: '/etc/profile.d/rbenv.sh' },
-  { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
-  { source: 'bin/rails', target: '/home/ec2-user/bin/rails' },
-  { source: 'bin/webapp', target: '/home/ec2-user/bin/webapp' },
-  { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
   { source: 'ssh/sshd_config', target: '/etc/ssh/sshd_config', handler: 'restart_sshd' },
   { source: 'ssh/sshd_service.conf', target: '/etc/systemd/system/sshd.service.d/sshd_service.conf', handler: 'restart_sshd' },
-  { source: 'chrony/chrony.conf', target: '/etc/chrony.conf', handler: 'restart_chronyd' },
-  { source: 'htop/htoprc', target: '/root/.config/htop/htoprc' },
+  { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
 
-  { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' },
-  { source: 'nginx/nginx.conf.erb', target: '/etc/nginx/nginx.conf', template: 'erb' },
-  { source: 'nginx/gzip.conf', target: '/etc/nginx/conf.d/gzip.conf' },
-  { source: 'nginx/webapp.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/webapp.conf' },
   { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/etc/nginx/conf.d/elasticbeanstalk-nginx-ruby-upstream.conf' },
+  { source: 'nginx/gzip.conf', target: '/etc/nginx/conf.d/gzip.conf' },
   { source: 'nginx/healthd.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/healthd.conf' },
-  { source: 'nginx/healthd_logformat.conf', target: '/etc/nginx/conf.d/healthd_logformat.conf' }
+  { source: 'nginx/healthd_logformat.conf', target: '/etc/nginx/conf.d/healthd_logformat.conf' },
+  { source: 'nginx/nginx.conf.erb', target: '/etc/nginx/nginx.conf', template: 'erb' },
+  { source: 'nginx/webapp.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/webapp.conf' },
+  { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' }
 ]
 
 SYMLINKS = [
-  { source: '/usr/bin/vim', target: '/usr/local/bin/vi' },
-  { source: '/etc/nginx', target: '.platform/nginx' } # Prevent /etc/nginx from being overwritten  
+  { source: '/etc/nginx', target: '.platform/nginx' }, # Prevent /etc/nginx from being overwritten  
+  { source: '/usr/bin/vim', target: '/usr/local/bin/vi' }
 ]
 
 AMAZON_LINUX_EXTRAS = %w[postgresql10]
 
-EATMYDATA_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/eatmydata/libeatmydata-0.1-00.21.el7.centos.x86_64.rpm'
-FILE_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm'
-FILE_LIBS_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm'
-WKHTMLTOPDF_RPM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/wkhtmltopdf/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm'
-TMUX_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/tmux/tmux-3.1c-2.amzn2.x86_64.rpm'
-LIBSODIUM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/libsodium/libsodium-1.0.18-1.el7.x86_64.rpm',
 DEEPSECURITY_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity/Agent-PGPCore-amzn2-20.0.0-2204.x86_64.rpm'
+EATMYDATA_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/eatmydata/libeatmydata-0.1-00.21.el7.centos.x86_64.rpm'
+FILE_LIBS_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm'
+FILE_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm'
+LIBSODIUM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/libsodium/libsodium-1.0.18-1.el7.x86_64.rpm',
+NCDU_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/ncdu/ncdu-1.15.1-1.el7.x86_64.rpm'
+RIPGREP_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/ripgrep/ripgrep-12.1.1-1.el7.x86_64.rpm', 
+TMUX_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/tmux/tmux-3.1c-2.amzn2.x86_64.rpm'
+WKHTMLTOPDF_RPM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/wkhtmltopdf/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm'
 
 YUM_PACKAGES = [
   { package: 'htop', creates: '/usr/bin/htop' },
   { package: 'iotop', creates: '/usr/sbin/iotop' },
-  { package: 'strace', creates: '/usr/bin/strace' },
-  { package: 'the_silver_searcher', creates: '/usr/bin/ag' },
-  { package: 'ncdu', creates: '/usr/bin/ncdu' },
   { package: 'mc', creates: '/usr/bin/mc' },
   { package: 'nodejs', creates: '/usr/bin/node' },
-  { package: 'yarn', creates: '/usr/bin/yarn' },
   { package: 'postgresql', creates: '/usr/share/doc/postgresql-10.*' },
-  { package: LIBSODIUM_URL, creates: '/usr/lib64/libsodium.so.*' },
-  { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
+  { package: 'strace', creates: '/usr/bin/strace' },
+  { package: 'yarn', creates: '/usr/bin/yarn' },
+  # { package: DEEPSECURITY_URL, creates: '/opt/ds_agent/ds_agent' },
   { package: FILE_LIBS_URL, creates: '/usr/share/doc/file-libs-5.39' },
+  { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
+  { package: LIBSODIUM_URL, creates: '/usr/lib64/libsodium.so.*' },
+  { package: NCDU_URL, creates: '/usr/bin/ncdu' },
+  { package: RIPGREP_URL, creates: '/usr/bin/rg' },
   { package: TMUX_URL, creates: '/usr/bin/tmux' },
-  { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' },
-  # { package: DEEPSECURITY_URL, creates: '/opt/ds_agent/ds_agent' }
+  { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
 ]
 
 YUM_CLEANUP = [
-  { package: 'mariadb*', removes: '/usr/bin/mysql' },
-  { package: 'ImageMagick*', removes: '/usr/bin/Magick-config' },
-  { package: 'postgres*-9*', removes: '/usr/share/doc/postgresql-9*' },
-  { package: 'iptables*', removes: '/sbin/iptables' },
   { package: 'hunspell*', removes: '/bin/hunspell' },
-  { package: 'tcsh', removes: '/bin/tcsh' },
-  { package: 'rng-tools', removes: '/usr/sbin/rngd' }
+  { package: 'ImageMagick*', removes: '/usr/bin/Magick-config' },
+  { package: 'iptables*', removes: '/sbin/iptables' },
+  { package: 'mariadb*', removes: '/usr/bin/mysql' },
+  { package: 'postgres*-9*', removes: '/usr/share/doc/postgresql-9*' },
+  { package: 'rng-tools', removes: '/usr/sbin/rngd' },
+  { package: 'tcsh', removes: '/bin/tcsh' }
 ]
 
 def enable_swap
