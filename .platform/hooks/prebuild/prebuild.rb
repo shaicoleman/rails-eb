@@ -107,7 +107,7 @@ def enable_eatmydata
   return if File.exist?('/usr/bin/eatmydata')
 
   # Only installed and enabled on first run
-  run("yum -y install #{EATMYDATA_URL}")
+  run("rpm -U #{EATMYDATA_URL}")
   log('Enabling eatmydata')
   ENV['LD_PRELOAD'] = '/usr/lib64/libeatmydata.so'
 end
