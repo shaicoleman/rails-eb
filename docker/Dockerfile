@@ -129,7 +129,7 @@ COPY --chown=webapp:webapp public/*.* public/
 
 RUN \
   mkdir -p ~/build && \
-  tar -c --exclude=node_modules --exclude=log/* . | zstd -T0 -11 > ~/build/app.tar.zst
+  tar -c --exclude=node_modules --exclude=log/* --exclude=config/local.rb . | zstd -T0 -11 > ~/build/app.tar.zst
 
 # RUN \
 #   cd ~/cashanalytics && \
