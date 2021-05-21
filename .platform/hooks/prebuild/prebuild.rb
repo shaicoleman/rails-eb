@@ -103,11 +103,12 @@ def nonblocking_dev_random
   run('rm /dev/random; sudo mknod -m 666 /dev/random c 1 9')
 end
 
-# Only enabled on first run
 def enable_eatmydata
-  return File.exist?('/usr/bin/eatmydata')
+  return if File.exist?('/usr/bin/eatmydata')
 
+  # Only installed and enabled on first run
   run("yum -y install #{EATMYDATA_URL}")
+  log('Enabling eatmydata')
   ENV['LD_PRELOAD'] = '/usr/lib64/libeatmydata.so'
 end
 
