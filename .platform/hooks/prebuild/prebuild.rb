@@ -37,12 +37,12 @@ FILES = [
   { source: 'ssh/sshd_service.conf', target: '/etc/systemd/system/sshd.service.d/sshd_service.conf', handler: 'restart_sshd' },
   { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
 
-  { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/etc/nginx/conf.d/elasticbeanstalk-nginx-ruby-upstream.conf' },
-  { source: 'nginx/gzip.conf', target: '/etc/nginx/conf.d/gzip.conf' },
-  { source: 'nginx/healthd.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/healthd.conf' },
-  { source: 'nginx/healthd_logformat.conf', target: '/etc/nginx/conf.d/healthd_logformat.conf' },
-  { source: 'nginx/nginx.conf.erb', target: '/etc/nginx/nginx.conf', template: 'erb' },
-  { source: 'nginx/webapp.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/webapp.conf' },
+  { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/etc/nginx/conf.d/elasticbeanstalk-nginx-ruby-upstream.conf', handler: 'test_nginx_config' },
+  { source: 'nginx/gzip.conf', target: '/etc/nginx/conf.d/gzip.conf', handler: 'test_nginx_config' },
+  { source: 'nginx/healthd.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/healthd.conf', handler: 'test_nginx_config' },
+  { source: 'nginx/healthd_logformat.conf', target: '/etc/nginx/conf.d/healthd_logformat.conf', handler: 'test_nginx_config' },
+  { source: 'nginx/nginx.conf.erb', target: '/etc/nginx/nginx.conf', template: 'erb', handler: 'test_nginx_config' },
+  { source: 'nginx/webapp.conf', target: '/etc/nginx/conf.d/elasticbeanstalk/webapp.conf', handler: 'test_nginx_config' },
   { source: 'puma/pumaconf.rb', target: '/opt/elasticbeanstalk/config/private/pumaconf.rb' }
 ]
 
@@ -214,6 +214,10 @@ end
 
 def restart_chronyd
   run('systemctl restart chronyd')
+end
+
+def test_nginx_config
+  run('nginx -t')
 end
 
 def update_motd
