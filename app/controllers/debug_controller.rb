@@ -3,6 +3,10 @@ class DebugController < ApplicationController
     raise 'Test error'
   end
 
+  def db
+    render json: { count: Company.count }
+  end
+
   def stress
     seconds = params[:seconds].presence&.to_f || 1.0
     stopwatch = Stopwatch.new
