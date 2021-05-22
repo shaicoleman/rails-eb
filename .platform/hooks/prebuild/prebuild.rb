@@ -7,7 +7,7 @@ def main
   init
   enable_eatmydata
   enable_swap
-  nonblocking_dev_random  
+  nonblocking_dev_random
   install_repos
   install_yum_packages
   cleanup_yum_packages
@@ -28,6 +28,7 @@ FILES = [
   { source: 'chrony/chrony.conf', target: '/etc/chrony.conf', handler: 'restart_chronyd' },
   { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
   { source: 'htop/htoprc', target: '/root/.config/htop/htoprc' },
+  { source: 'journald/journald.conf', target: '/etc/systemd/journald.conf', handler: 'restart_journald' },
   { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', handler: 'update_motd', no_backup: true },
   { source: 'profile.d/profile.sh', target: '/etc/profile.d/profile.sh' },
   { source: 'profile.d/prompt.sh', target: '/etc/profile.d/prompt.sh' },
@@ -209,6 +210,11 @@ end
 
 def restart_sshd
   run('systemctl daemon-reload; sshd -t && systemctl restart sshd')
+end
+
+def restart_journald
+  FileUtils.mkdir_p('/var/log/journal', mode: 02755)
+  run('systemctl restart systemd-journald')
 end
 
 def restart_chronyd
