@@ -77,7 +77,7 @@ YUM_PACKAGES = [
   { package: NCDU_URL, creates: '/usr/bin/ncdu' },
   { package: RIPGREP_URL, creates: '/usr/bin/rg' },
   { package: TMUX_URL, creates: '/usr/bin/tmux' },
-  { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
+  # { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
 ]
 
 YUM_CLEANUP = [
