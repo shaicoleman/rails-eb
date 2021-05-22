@@ -1,2 +1,0 @@
-#!/bin/bash
-sudo -i bash -c $"su webapp -s /bin/bash --session-command 'cd /var/app/current; bin/rails \"$@\"'"

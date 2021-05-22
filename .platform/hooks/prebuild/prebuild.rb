@@ -24,7 +24,6 @@ def main
 end
 
 FILES = [
-  { source: 'bin/rails', target: '/home/ec2-user/bin/rails' },
   { source: 'bin/webapp', target: '/home/ec2-user/bin/webapp' },
   { source: 'chrony/chrony.conf', target: '/etc/chrony.conf', handler: 'restart_chronyd' },
   { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
