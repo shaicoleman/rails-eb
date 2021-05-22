@@ -17,6 +17,7 @@ def main
   create_symlinks
   run_handlers
   change_webapp_shell
+  enable_linger
   check_ruby_version
   upgrade_bundler
   upgrade_reline
@@ -233,6 +234,12 @@ def change_webapp_shell
   return if File.read('/etc/passwd').match?(%r{^webapp:.*:/bin/bash$})
 
   run('usermod --shell /bin/bash webapp')
+end
+
+def enable_linger
+  return if File.exist?('/var/lib/systemd/linger/webapp')
+
+  run('loginctl enable-linger ec2-user webapp')
 end
 
 main
