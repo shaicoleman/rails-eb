@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   resources :uploads, only: [:new, :create]
 
+  get '/debug/env'
   get '/debug/trigger_error'
   get '/debug/build_info'
   get '/debug/instance_id'

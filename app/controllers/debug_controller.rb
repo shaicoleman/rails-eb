@@ -31,6 +31,10 @@ class DebugController < ApplicationController
                    body: request.body }
   end
 
+  def env
+    render json: { env: ENV.keys.sort }
+  end
+
   def instance_id
     instance_id = `ec2-metadata --instance-id || true`.match(/(i-[0-9a-z]+)/)&.captures&.first
     render json: { instance_id: instance_id }
