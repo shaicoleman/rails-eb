@@ -231,6 +231,7 @@ def change_webapp_shell
   run('usermod --shell /bin/bash webapp')
 end
 
+# Don't kill tmux/screen sessions
 def enable_linger
   return if File.exist?('/var/lib/systemd/linger/webapp')
 
