@@ -20,7 +20,6 @@ def main
   enable_linger
   check_ruby_version
   upgrade_bundler
-  upgrade_reline
   finish
 end
 
@@ -136,14 +135,6 @@ def upgrade_bundler
   return if Gem::Version.new(installed_version) >= Gem::Version.new(gemfile_version)
 
   run('gem install bundler')
-end
-
-def upgrade_reline
-  minimum_version = '0.2.5'
-  installed_version = `ruby -e "require 'reline'; print Reline::VERSION"`
-  return if Gem::Version.new(installed_version) >= Gem::Version.new(minimum_version)
-
-  run('gem install reline')
 end
 
 def extract_app
