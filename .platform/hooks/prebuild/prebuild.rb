@@ -30,7 +30,7 @@ FILES = [
   { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
   { source: 'htop/htoprc', target: '/root/.config/htop/htoprc' },
   { source: 'journald/journald.conf', target: '/etc/systemd/journald.conf', handler: 'restart_journald' },
-  { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', handler: 'update_motd', no_backup: true },
+  { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', no_backup: true },
   { source: 'profile.d/profile.sh', target: '/etc/profile.d/profile.sh' },
   { source: 'profile.d/prompt.sh', target: '/etc/profile.d/prompt.sh' },
   { source: 'profile.d/rbenv.sh', target: '/etc/profile.d/rbenv.sh' },
@@ -54,16 +54,6 @@ SYMLINKS = [
 
 AMAZON_LINUX_EXTRAS = %w[postgresql10]
 
-DEEPSECURITY_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity/Agent-PGPCore-amzn2-20.0.0-2204.x86_64.rpm'
-EATMYDATA_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/eatmydata/libeatmydata-0.1-00.21.el7.centos.x86_64.rpm'
-FILE_LIBS_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm'
-FILE_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm'
-LIBSODIUM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/libsodium/libsodium-1.0.18-1.el7.x86_64.rpm',
-NCDU_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/ncdu/ncdu-1.15.1-1.el7.x86_64.rpm'
-RIPGREP_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/ripgrep/ripgrep-12.1.1-1.el7.x86_64.rpm', 
-TMUX_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/tmux/tmux-3.1c-2.amzn2.x86_64.rpm'
-WKHTMLTOPDF_RPM_URL = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/wkhtmltopdf/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm'
-
 YUM_PACKAGES = [
   { package: 'htop', creates: '/usr/bin/htop' },
   { package: 'iotop', creates: '/usr/sbin/iotop' },
@@ -72,14 +62,22 @@ YUM_PACKAGES = [
   { package: 'postgresql', creates: '/usr/share/doc/postgresql-10.*' },
   { package: 'strace', creates: '/usr/bin/strace' },
   { package: 'yarn', creates: '/usr/bin/yarn' },
-  # { package: DEEPSECURITY_URL, creates: '/opt/ds_agent/ds_agent' },
-  { package: FILE_LIBS_URL, creates: '/usr/share/doc/file-libs-5.39' },
-  { package: FILE_URL, creates: '/usr/share/doc/file-5.39' },
-  { package: LIBSODIUM_URL, creates: '/usr/lib64/libsodium.so.*' },
-  { package: NCDU_URL, creates: '/usr/bin/ncdu' },
-  { package: RIPGREP_URL, creates: '/usr/bin/rg' },
-  { package: TMUX_URL, creates: '/usr/bin/tmux' },
-  # { package: WKHTMLTOPDF_RPM_URL, creates: '/usr/local/bin/wkhtmltopdf' }
+  # { package: 'ds_agent', creates: '/opt/ds_agent/ds_agent',
+  #   url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity/Agent-PGPCore-amzn2-20.0.0-2204.x86_64.rpm' },
+  { package: 'file-libs', creates: '/usr/share/doc/file-libs-5.39',
+    url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm' },
+  { package: 'file', creates: '/usr/share/doc/file-5.39',
+    url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm' },
+  { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*',
+    url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/libsodium/libsodium-1.0.18-1.el7.x86_64.rpm' },
+  { package: 'ncdu', creates: '/usr/bin/ncdu',
+    url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/ncdu/ncdu-1.15.1-1.el7.x86_64.rpm' },
+  { package: 'ripgrep', creates: '/usr/bin/rg',
+    url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/ripgrep/ripgrep-12.1.1-1.el7.x86_64.rpm' },
+  { package: 'tmux', creates: '/usr/bin/tmux',
+    url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/tmux/tmux-3.1c-2.amzn2.x86_64.rpm' },
+  # { package: 'wkhtmltox', creates: '/usr/local/bin/wkhtmltopdf',
+  #   url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/wkhtmltopdf/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm' }
 ]
 
 YUM_CLEANUP = [
@@ -111,7 +109,8 @@ def enable_eatmydata
   return if File.exist?('/usr/bin/eatmydata')
 
   # Only installed and enabled on first run
-  run("rpm -U #{EATMYDATA_URL}")
+  url = 'https://ca-downloads.s3-eu-west-1.amazonaws.com/eatmydata/libeatmydata-0.1-00.21.el7.centos.x86_64.rpm'
+  run("rpm -U #{url}")
   log('Enabling eatmydata')
   ENV['LD_PRELOAD'] = '/usr/lib64/libeatmydata.so'
 end
@@ -195,7 +194,7 @@ end
 
 def install_yum_packages
   to_install = YUM_PACKAGES.reject { |item| Dir.glob(item[:creates]).any? } \
-                           .map { |item| item[:package] }
+                           .map { |item| item[:url] || item[:package] }
   return if to_install.empty?
 
   run("yum -y install #{to_install.join(' ')}")
@@ -224,10 +223,6 @@ end
 
 def test_nginx_config
   run('nginx -t')
-end
-
-def update_motd
-  run('update-motd')
 end
 
 def change_webapp_shell
