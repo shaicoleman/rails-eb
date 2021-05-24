@@ -192,16 +192,16 @@ def reload_sysctl
 end
 
 def restart_sshd
-  run('systemctl daemon-reload; sshd -t && systemctl restart sshd')
+  run('systemctl daemon-reload; sshd -t && systemctl restart sshd --no-block')
 end
 
 def restart_journald
   FileUtils.mkdir_p('/var/log/journal', mode: 02755)
-  run('systemctl restart systemd-journald')
+  run('systemctl restart systemd-journald --no-block')
 end
 
 def restart_chronyd
-  run('systemctl restart chronyd')
+  run('systemctl restart chronyd --no-block')
 end
 
 def test_nginx_config
