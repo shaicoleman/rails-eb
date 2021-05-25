@@ -16,15 +16,14 @@ def main
   copy_files
   create_symlinks
   run_handlers
-  change_webapp_shell
-  enable_linger
+  create_users
+  configure_users
   check_ruby_version
   upgrade_bundler
   finish
 end
 
 FILES = [
-  { source: 'bin/webapp', target: '/home/ec2-user/bin/webapp' },
   { source: 'chrony/chrony.conf', target: '/etc/chrony.conf', handler: 'restart_chronyd' },
   { source: 'elasticbeanstalk/checkforraketask.rb', target: '/opt/elasticbeanstalk/config/private/checkforraketask.rb' },
   { source: 'htop/htoprc', target: '/root/.config/htop/htoprc' },
@@ -36,6 +35,7 @@ FILES = [
   { source: 'ssh/sshd_config', target: '/etc/ssh/sshd_config', handler: 'restart_sshd' },
   { source: 'ssh/sshd_service.conf', target: '/etc/systemd/system/sshd.service.d/sshd_service.conf', handler: 'restart_sshd' },
   { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
+  { source: 'sudoers.d/sudo', target: '/etc/sudoers.d/sudo' },
 
   { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/etc/nginx/conf.d/elasticbeanstalk-nginx-ruby-upstream.conf', handler: 'test_nginx_config' },
   { source: 'nginx/gzip.conf', target: '/etc/nginx/conf.d/gzip.conf', handler: 'test_nginx_config' },
@@ -49,6 +49,10 @@ FILES = [
 SYMLINKS = [
   { source: '/etc/nginx', target: '.platform/nginx' }, # Prevent /etc/nginx from being overwritten  
   { source: '/usr/bin/vim', target: '/usr/local/bin/vi' }
+]
+
+USERS = [
+  { username: 'shai.coleman', iam_user: 'shaicoleman2' }
 ]
 
 AMAZON_LINUX_EXTRAS = %w[postgresql10]
@@ -208,17 +212,28 @@ def test_nginx_config
   run('nginx -t')
 end
 
-def change_webapp_shell
-  return if File.read('/etc/passwd').match?(%r{^webapp:.*:/bin/bash$})
+def create_users
+  unless `getent group sudo`.start_with?('sudo:')
+    run('groupadd sudo')
+  end
 
-  run('usermod --shell /bin/bash webapp')
+  USERS.each do |user|
+    username = user[:username]
+    unless File.exist?("/home/#{username}")
+      run("adduser #{username} --gid webapp --groups sudo")
+    end
+
+    # Don't kill tmux/screen sessions
+    unless File.exist?("/var/lib/systemd/linger/#{username}")
+      run("loginctl enable-linger ec2-user #{username}")
+    end
+  end
 end
 
-# Don't kill tmux/screen sessions
-def enable_linger
-  return if File.exist?('/var/lib/systemd/linger/webapp')
-
-  run('loginctl enable-linger ec2-user webapp')
+def configure_users
+  unless File.read('/etc/passwd').match?(%r{^webapp:.*:/bin/bash$})
+    run('usermod --shell /sbin/nologin webapp')
+  end
 end
 
 main
