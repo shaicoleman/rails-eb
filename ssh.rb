@@ -2,7 +2,7 @@
 
 require 'json'
 require 'yaml'
-# require 'byebug'
+require 'byebug'
 # require 'ap'
 require 'time'
 require 'action_view'
@@ -15,6 +15,7 @@ def main
   get_instances
   show_instances
   choose_instance
+  wait_for_instance
   ec2_instance_connect
   ssh
 end
@@ -38,7 +39,7 @@ def get_instances
         "--filters 'Name=tag:elasticbeanstalk:environment-name,Values=#{@env_name}' " \
         "--query 'Reservations[].Instances[]'"
   result = JSON.parse(`#{cmd}`)
-  @instances = result.map do |instance|
+  all_instances = result.map do |instance|
     {
       instance_id: instance['InstanceId'],
       availability_zone: instance.dig('Placement', 'AvailabilityZone'),
@@ -50,7 +51,9 @@ def get_instances
       public_ip: instance['PublicIpAddress'],
       state: instance.dig('State', 'Name'),
     }
-  end.sort_by { |i| i[:launch_time] }.reverse
+  end
+  @instances = all_instances.select { |i| i[:state] == 'pending' || i[:state] == 'running' } \
+                            .sort_by { |i| i[:launch_time] }.reverse
 end
 
 def show_instances
@@ -63,6 +66,15 @@ def choose_instance
   @instance = @instances.first
 end
 
+def wait_for_instance
+  0.step do |count|
+    break if Time.now >= @instance[:launch_time] + 60
+
+    puts "Waiting for instance to launch..." if count == 0
+    sleep 1
+  end
+end
+
 def ec2_instance_connect
   cmd = "aws ec2-instance-connect send-ssh-public-key " \
         "--instance-id #{@instance[:instance_id]} " \
@@ -73,17 +85,9 @@ def ec2_instance_connect
 end
 
 def ssh
-  puts "ssh -o IdentitiesOnly=yes -i #{@private_key_file} #{@instance_os_user}@#{@instance[:public_ip]}"
+  cmd = "ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i #{@private_key_file} #{@instance_os_user}@#{@instance[:public_ip]}"
+  puts cmd
+  exec(cmd)
 end
 
 main
-
-
-
-# aws ec2-instance-connect send-ssh-public-key \
-#     --instance-id i-0896fc126d9300906 \
-#     --availability-zone eu-west-1a \
-#     --instance-os-user shai.coleman \
-#     --ssh-public-key file:///home/shai/.ssh/id_rsa.pub
-
-# ssh -o "IdentitiesOnly=yes" -i /home/shai/.ssh/id_rsa shai.coleman@54.170.187.101
