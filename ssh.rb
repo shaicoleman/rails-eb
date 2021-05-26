@@ -85,7 +85,12 @@ def ec2_instance_connect
 end
 
 def ssh
-  cmd = "ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i #{@private_key_file} #{@instance_os_user}@#{@instance[:public_ip]}"
+  cmd = "ssh -o GlobalKnownHostsFile=/dev/null " \
+        "-o UserKnownHostsFile=/dev/null " \
+        "-o StrictHostKeyChecking=no " \
+        "-o IdentitiesOnly=yes " \
+        "-i #{@private_key_file} " \
+        "#{@instance_os_user}@#{@instance[:public_ip]}"
   puts cmd
   exec(cmd)
 end
