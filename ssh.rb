@@ -83,10 +83,10 @@ def validate_environment
   env_names = JSON.parse(`#{cmd}`).sort
 
   unless env_names.include?(@env_name)
-    abort "Invalid environment name, valid environments are:\n#{env_names.join("\n")}"
+    abort "Error: Environment name is invalid, valid environments are:\n#{env_names.join("\n")}"
   end
 
-  abort "No instances available"
+  abort "Error: No instances available"
 end
 
 def choose_instance
@@ -122,6 +122,12 @@ def wait_for_instance
     puts "Waiting for instance to launch..." if count == 0
     sleep 1
   end
+
+  unless @instance[:public_ip]
+    get_instances
+    @instance = @instances.find { |inst| inst[:instance_id] == @instance[:instance_id] }
+    abort "Instance #{instance_id} went away" unless @instance
+  end
 end
 
 def ec2_instance_connect
@@ -131,7 +137,6 @@ def ec2_instance_connect
         "--instance-os-user #{@username} " \
         "--ssh-public-key file://#{@public_key} " \
         "--output json"
-  puts cmd
   result = JSON.parse(`#{cmd}`)
 end
 
