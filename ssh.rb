@@ -13,6 +13,7 @@ def main
   load_config
   get_env_name
   get_instances
+  validate_environment
   show_instances
   choose_instance
   wait_for_instance
@@ -44,7 +45,8 @@ end
 def get_instances
   cmd = "aws ec2 describe-instances " \
         "--filters 'Name=tag:elasticbeanstalk:environment-name,Values=#{@env_name}' " \
-        "--query 'Reservations[].Instances[]'"
+        "--query 'Reservations[].Instances[]' " \
+        "--output json"
   result = JSON.parse(`#{cmd}`)
   all_instances = result.map do |instance|
     {
@@ -72,9 +74,22 @@ def show_instances
   end
 end
 
-def choose_instance
-  abort 'No valid instance' unless @instances.any?
+def validate_environment
+  return if @instances.any?
 
+  cmd = "aws elasticbeanstalk describe-environments " \
+        "--query 'Environments[].EnvironmentName' " \
+        "--output json"
+  env_names = JSON.parse(`#{cmd}`).sort
+
+  unless env_names.include?(@env_name)
+    abort "Invalid environment name, valid environments are:\n#{env_names.join("\n")}"
+  end
+
+  abort "No instances available"
+end
+
+def choose_instance
   if @instances.one?
     @instance = @instances.first
     return
@@ -114,7 +129,9 @@ def ec2_instance_connect
         "--instance-id #{@instance[:instance_id]} " \
         "--availability-zone #{@instance[:availability_zone]} " \
         "--instance-os-user #{@username} " \
-        "--ssh-public-key file://#{@public_key}"
+        "--ssh-public-key file://#{@public_key} " \
+        "--output json"
+  puts cmd
   result = JSON.parse(`#{cmd}`)
 end
 
