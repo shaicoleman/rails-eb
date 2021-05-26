@@ -54,17 +54,43 @@ def get_instances
   end
   @instances = all_instances.select { |i| i[:state] == 'pending' || i[:state] == 'running' } \
                             .sort_by { |i| i[:launch_time] }.reverse
-  abort 'No valid instance' unless @instances.any?
 end
 
 def show_instances
+  puts "Select an instance to ssh into" if @instances.size > 1
+
   @instances.each.with_index(1) do |inst, i|
+    instance_count = "#{i}) " if @instances.one?
     puts "#{i}) #{inst[:instance_id]}, #{inst[:state]}, launched #{time_ago_in_words(inst[:launch_time])} ago, #{inst[:public_ip]}"
   end
 end
 
 def choose_instance
-  @instance = @instances.first
+  abort 'No valid instance' unless @instances.any?
+
+  if @instances.one?
+    @instance = @instances.first
+    return
+  end
+
+  loop do
+    print "(default is 1): "
+    instance_str = gets&.strip
+    exit unless instance_str
+
+    if instance_str == ''
+      @instance = @instances.first
+      return
+    end
+
+    instance_num = Integer(instance_str, exception: false)
+    unless instance_num >= 1 && instance_num <= @instances.size
+      puts "Sorry, that is not a valid choice. Please choose a number between 1 and #{@instances.size}."
+    end
+
+    @instance = @instances[instance_num - 1]
+    return if @instance
+  end
 end
 
 def wait_for_instance
