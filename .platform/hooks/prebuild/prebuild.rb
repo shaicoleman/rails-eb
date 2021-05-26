@@ -19,7 +19,7 @@ def main
   create_users
   configure_users
   check_ruby_version
-  upgrade_bundler
+  # upgrade_bundler
   finish
 end
 
