@@ -12,6 +12,7 @@ include ActionView::Helpers::DateHelper
 def main
   config
   get_env_name
+  get_username
   get_instances
   show_instances
   choose_instance
@@ -21,17 +22,22 @@ def main
 end
 
 def config
-  @instance_os_user = 'shai.coleman'
   @public_key_file = File.expand_path('~/.ssh/id_rsa.pub')
   @private_key_file = File.expand_path('~/.ssh/id_rsa')
+  @eb_config = YAML.safe_load(File.read('.elasticbeanstalk/config.yml'), aliases: true)
 end
 
 def get_env_name
   git_branch = `git rev-parse --abbrev-ref HEAD`.strip
-  eb_config = YAML.safe_load(File.read('.elasticbeanstalk/config.yml'), aliases: true)
   @env_name = ARGV[0] ||
-              eb_config.dig('branch-defaults', git_branch, 'environment') ||
-              eb_config.dig('branch-defaults', 'default', 'environment')
+              @eb_config.dig('branch-defaults', git_branch, 'environment') ||
+              @eb_config.dig('branch-defaults', 'default', 'environment')
+end
+
+def get_username
+  @username = @eb_config.dig('ssh', 'username')
+
+  abort "Please add to your .elasticbeanstalk/config.yml:\nssh:\n  user_name: joe.bloggs" if @username.to_s.empty?
 end
 
 def get_instances
@@ -106,7 +112,7 @@ def ec2_instance_connect
   cmd = "aws ec2-instance-connect send-ssh-public-key " \
         "--instance-id #{@instance[:instance_id]} " \
         "--availability-zone #{@instance[:availability_zone]} " \
-        "--instance-os-user #{@instance_os_user} " \
+        "--instance-os-user #{@username} " \
         "--ssh-public-key file://#{@public_key_file}"
   result = JSON.parse(`#{cmd}`)
 end
@@ -117,7 +123,7 @@ def ssh
         "-o StrictHostKeyChecking=no " \
         "-o IdentitiesOnly=yes " \
         "-i #{@private_key_file} " \
-        "#{@instance_os_user}@#{@instance[:public_ip]}"
+        "#{@username}@#{@instance[:public_ip]}"
   puts cmd
   exec(cmd)
 end
