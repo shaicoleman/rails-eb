@@ -149,7 +149,8 @@ def ssh
         "-c aes128-gcm@openssh.com " \
         "-i #{@private_key} " \
         "#{@username}@#{@instance[:public_ip]}"
-  puts cmd
+  puts "ssh -i #{@private_key} #{@username}@#{@instance[:public_ip]}"
+
   exec(cmd)
 end
 
