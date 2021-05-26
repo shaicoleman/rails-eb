@@ -5,6 +5,9 @@ require_relative './build_utils'
 
 def main
   init
+  create_users
+  configure_users
+  delete_ec2_user
   enable_eatmydata
   enable_swap
   nonblocking_dev_random
@@ -16,8 +19,6 @@ def main
   copy_files
   create_symlinks
   run_handlers
-  create_users
-  configure_users
   check_ruby_version
   # upgrade_bundler
   finish
@@ -35,7 +36,6 @@ FILES = [
   { source: 'ssh/sshd_config', target: '/etc/ssh/sshd_config', handler: 'restart_sshd' },
   { source: 'ssh/sshd_service.conf', target: '/etc/systemd/system/sshd.service.d/sshd_service.conf', handler: 'restart_sshd' },
   { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
-  { source: 'sudoers.d/sudo', target: '/etc/sudoers.d/sudo' },
 
   { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/etc/nginx/conf.d/elasticbeanstalk-nginx-ruby-upstream.conf', handler: 'test_nginx_config' },
   { source: 'nginx/gzip.conf', target: '/etc/nginx/conf.d/gzip.conf', handler: 'test_nginx_config' },
@@ -52,7 +52,7 @@ SYMLINKS = [
 ]
 
 USERS = [
-  { username: 'shai.coleman', iam_user: 'shaicoleman2' }
+  { username: 'shai.coleman' }
 ]
 
 AMAZON_LINUX_EXTRAS = %w[postgresql10]
@@ -212,20 +212,18 @@ def test_nginx_config
   run('nginx -t')
 end
 
+def delete_ec2_user
+  `userdel --remove --force ec2-user` if File.exist?('/home/ec2-user')
+end
+
 def create_users
   unless `getent group sudo`.start_with?('sudo:')
     run('groupadd sudo')
   end
 
   USERS.each do |user|
-    username = user[:username]
-    unless File.exist?("/home/#{username}")
-      run("adduser #{username} --gid webapp --groups sudo")
-    end
-
-    # Don't kill tmux/screen sessions
-    unless File.exist?("/var/lib/systemd/linger/#{username}")
-      run("loginctl enable-linger ec2-user #{username}")
+    unless File.exist?("/home/#{user[:username]}")
+      run("adduser #{user[:username]} --gid webapp --groups sudo")
     end
   end
 end
@@ -234,6 +232,13 @@ def configure_users
   unless File.read('/etc/passwd').match?(%r{^webapp:.*:/bin/bash$})
     run('usermod --shell /sbin/nologin webapp')
   end
+
+  # Don't kill tmux/screen sessions
+  linger_users = USERS.reject { |user| File.exist?("/var/lib/systemd/linger/#{user[:username]}") } \
+                      .map { |user| user[:username] }
+  run("loginctl enable-linger #{linger_users.join(' ')}") if linger_users.any?
+
+  copy_file({ source: 'sudoers.d/sudo', target: '/etc/sudoers.d/sudo' })
 end
 
 main
