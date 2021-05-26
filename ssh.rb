@@ -54,6 +54,7 @@ def get_instances
   end
   @instances = all_instances.select { |i| i[:state] == 'pending' || i[:state] == 'running' } \
                             .sort_by { |i| i[:launch_time] }.reverse
+  abort 'No valid instance' unless @instances.any?
 end
 
 def show_instances
