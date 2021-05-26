@@ -10,9 +10,8 @@ require 'action_view'
 include ActionView::Helpers::DateHelper
 
 def main
-  config
+  load_config
   get_env_name
-  get_username
   get_instances
   show_instances
   choose_instance
@@ -21,10 +20,17 @@ def main
   ssh
 end
 
-def config
-  @public_key_file = File.expand_path('~/.ssh/id_rsa.pub')
-  @private_key_file = File.expand_path('~/.ssh/id_rsa')
+def load_config
   @eb_config = YAML.safe_load(File.read('.elasticbeanstalk/config.yml'), aliases: true)
+  @username = @eb_config.dig('ssh', 'username')
+
+  abort "Please add to your .elasticbeanstalk/config.yml:\nssh:\n  user_name: joe.bloggs\n  public_key: ~/.ssh/id_rsa.pub\n  private_key: ~/.ssh/id_rsa" if @username.to_s.empty?
+
+  @public_key = File.expand_path(@eb_config.dig('ssh', 'public_key') || '~/.ssh/id_rsa.pub')
+  @private_key = File.expand_path(@eb_config.dig('ssh', 'private_key') || '~/.ssh/id_rsa')
+
+  abort "Invalid public_key: #{@public_key}" unless File.exist?(@public_key)
+  abort "Invalid private_key: #{@private_key}" unless File.exist?(@private_key)
 end
 
 def get_env_name
@@ -32,12 +38,7 @@ def get_env_name
   @env_name = ARGV[0] ||
               @eb_config.dig('branch-defaults', git_branch, 'environment') ||
               @eb_config.dig('branch-defaults', 'default', 'environment')
-end
-
-def get_username
-  @username = @eb_config.dig('ssh', 'username')
-
-  abort "Please add to your .elasticbeanstalk/config.yml:\nssh:\n  user_name: joe.bloggs" if @username.to_s.empty?
+  puts "EB Environment: #{@env_name}"
 end
 
 def get_instances
@@ -113,7 +114,7 @@ def ec2_instance_connect
         "--instance-id #{@instance[:instance_id]} " \
         "--availability-zone #{@instance[:availability_zone]} " \
         "--instance-os-user #{@username} " \
-        "--ssh-public-key file://#{@public_key_file}"
+        "--ssh-public-key file://#{@public_key}"
   result = JSON.parse(`#{cmd}`)
 end
 
@@ -122,7 +123,7 @@ def ssh
         "-o UserKnownHostsFile=/dev/null " \
         "-o StrictHostKeyChecking=no " \
         "-o IdentitiesOnly=yes " \
-        "-i #{@private_key_file} " \
+        "-i #{@private_key} " \
         "#{@username}@#{@instance[:public_ip]}"
   puts cmd
   exec(cmd)
