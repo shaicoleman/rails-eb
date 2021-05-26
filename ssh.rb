@@ -145,6 +145,7 @@ def ssh
         "-o UserKnownHostsFile=/dev/null " \
         "-o StrictHostKeyChecking=no " \
         "-o IdentitiesOnly=yes " \
+        "-o BatchMode=yes " \
         "-o HostKeyAlgorithms=ssh-ed25519 " \
         "-c aes128-gcm@openssh.com " \
         "-i #{@private_key} " \
