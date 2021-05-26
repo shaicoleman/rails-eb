@@ -23,10 +23,7 @@ PermitRootLogin no
 
 UsePrivilegeSeparation sandbox
 
-# Accept locale-related environment variables
-AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
-AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
-AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+# Accept environment variables
 AcceptEnv XMODIFIERS
 
 # WARNING: 'UsePAM no' is not supported in Red Hat Enterprise Linux and may cause several problems.
