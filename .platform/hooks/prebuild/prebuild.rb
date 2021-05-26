@@ -212,10 +212,6 @@ def test_nginx_config
   run('nginx -t')
 end
 
-def delete_ec2_user
-  `userdel --remove --force ec2-user` if File.exist?('/home/ec2-user')
-end
-
 def create_users
   unless `getent group sudo`.start_with?('sudo:')
     run('groupadd sudo')
@@ -229,16 +225,20 @@ def create_users
 end
 
 def configure_users
-  unless File.read('/etc/passwd').match?(%r{^webapp:.*:/bin/bash$})
-    run('usermod --shell /sbin/nologin webapp')
-  end
-
   # Don't kill tmux/screen sessions
   linger_users = USERS.reject { |user| File.exist?("/var/lib/systemd/linger/#{user[:username]}") } \
                       .map { |user| user[:username] }
   run("loginctl enable-linger #{linger_users.join(' ')}") if linger_users.any?
 
   copy_file({ source: 'sudoers.d/sudo', target: '/etc/sudoers.d/sudo' })
+
+  unless File.read('/etc/passwd').match?(%r{^webapp:.*:/bin/bash$})
+    run('usermod --shell /sbin/nologin webapp')
+  end
+end
+
+def delete_ec2_user
+  `userdel --remove --force ec2-user` if File.exist?('/home/ec2-user')
 end
 
 main
