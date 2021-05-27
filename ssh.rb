@@ -98,7 +98,7 @@ def choose_instance
 
   loop do
     print "(default is 1): "
-    instance_str = gets&.strip
+    instance_str = STDIN.gets&.strip
     exit unless instance_str
 
     if instance_str == ''
