@@ -59,23 +59,30 @@ USERS = [
 AMAZON_LINUX_EXTRAS = %w[postgresql10]
 
 YUM_PACKAGES = [
+  # Server monitoring/logging/security
   { package: 'awslogs', creates: '/usr/sbin/awslogsd' },
   { package: 'amazon-cloudwatch-agent', creates: '/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent' },
+  { package: 'amazon-ssm-agent', creates: '/usr/bin/amazon-ssm-agent' },
+  { package: 'ec2-instance-connect', creates: '/opt/aws/bin/eic_run_authorized_keys' },
   # { package: 'ds_agent', creates: '/opt/ds_agent/ds_agent', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity/Agent-PGPCore-amzn2-20.0.0-2204.x86_64.rpm' },
+
+  # App dependencies
   { package: 'file', creates: '/usr/share/doc/file-5.39', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm' },
   { package: 'file-libs', creates: '/usr/share/doc/file-libs-5.39', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm' },
-  { package: 'htop', creates: '/usr/bin/htop' },
-  { package: 'iotop', creates: '/usr/sbin/iotop' },
   { package: 'libsodium', creates: '/usr/lib64/libsodium.so.*', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/libsodium/libsodium-1.0.18-1.el7.x86_64.rpm' },
-  { package: 'mc', creates: '/usr/bin/mc' },
-  { package: 'ncdu', creates: '/usr/bin/ncdu', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/ncdu/ncdu-1.15.1-1.el7.x86_64.rpm' },
   { package: 'nodejs', creates: '/usr/bin/node' },
   { package: 'postgresql', creates: '/usr/share/doc/postgresql-10.*' },
+  # { package: 'wkhtmltox', creates: '/usr/local/bin/wkhtmltopdf', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/wkhtmltopdf/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm' },
+  { package: 'yarn', creates: '/usr/bin/yarn' },
+
+  # Utilities
+  { package: 'htop', creates: '/usr/bin/htop' },
+  { package: 'iotop', creates: '/usr/sbin/iotop' },
+  { package: 'mc', creates: '/usr/bin/mc' },
+  { package: 'ncdu', creates: '/usr/bin/ncdu', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/ncdu/ncdu-1.15.1-1.el7.x86_64.rpm' },
   { package: 'ripgrep', creates: '/usr/bin/rg', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/ripgrep/ripgrep-12.1.1-1.el7.x86_64.rpm' },
   { package: 'strace', creates: '/usr/bin/strace' },
-  { package: 'tmux', creates: '/usr/bin/tmux', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/tmux/tmux-3.1c-2.amzn2.x86_64.rpm' },
-  # { package: 'wkhtmltox', creates: '/usr/local/bin/wkhtmltopdf', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/wkhtmltopdf/wkhtmltox-0.12.6-1.amazonlinux2.x86_64.rpm' },
-  { package: 'yarn', creates: '/usr/bin/yarn' }
+  { package: 'tmux', creates: '/usr/bin/tmux', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/tmux/tmux-3.1c-2.amzn2.x86_64.rpm' }
 ]
 
 YUM_CLEANUP = [
