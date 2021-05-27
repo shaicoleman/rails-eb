@@ -19,6 +19,7 @@ def main
   copy_files
   create_symlinks
   run_handlers
+  restart_awslogs
   check_ruby_version
   # upgrade_bundler
   finish
@@ -59,6 +60,7 @@ AMAZON_LINUX_EXTRAS = %w[postgresql10]
 
 YUM_PACKAGES = [
   { package: 'awslogs', creates: '/usr/sbin/awslogsd' },
+  { package: 'amazon-cloudwatch-agent', creates: '/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent' },
   # { package: 'ds_agent', creates: '/opt/ds_agent/ds_agent', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity/Agent-PGPCore-amzn2-20.0.0-2204.x86_64.rpm' },
   { package: 'file', creates: '/usr/share/doc/file-5.39', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm' },
   { package: 'file-libs', creates: '/usr/share/doc/file-libs-5.39', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm' },
@@ -211,6 +213,10 @@ end
 
 def test_nginx_config
   run('nginx -t')
+end
+
+def restart_awslogs
+  run('systemctl enable awslogsd && systemctl restart awslogsd --no-block')
 end
 
 def create_users
