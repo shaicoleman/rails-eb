@@ -40,7 +40,7 @@ def get_env_name
   @env_name = ARGV[0] ||
               @eb_config.dig('branch-defaults', git_branch, 'environment') ||
               @eb_config.dig('branch-defaults', 'default', 'environment')
-  puts "EB Environment: #{@env_name}"
+  puts "EB Environment: #{@env_name}" unless ARGV[0]
 end
 
 def get_instances
