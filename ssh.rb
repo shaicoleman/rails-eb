@@ -118,7 +118,7 @@ end
 
 def wait_for_instance
   0.step do |count|
-    break if Time.now >= @instance[:launch_time] + 30
+    break if Time.now >= @instance[:launch_time] + 60
 
     puts "Waiting for instance to launch..." if count == 0
     sleep 1
