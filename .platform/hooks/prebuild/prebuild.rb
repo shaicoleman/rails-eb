@@ -58,6 +58,7 @@ USERS = [
 AMAZON_LINUX_EXTRAS = %w[postgresql10]
 
 YUM_PACKAGES = [
+  { package: 'awslogs', creates: '/usr/sbin/awslogsd' },
   # { package: 'ds_agent', creates: '/opt/ds_agent/ds_agent', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/deepsecurity/Agent-PGPCore-amzn2-20.0.0-2204.x86_64.rpm' },
   { package: 'file', creates: '/usr/share/doc/file-5.39', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-5.39-5.amzn2.x86_64.rpm' },
   { package: 'file-libs', creates: '/usr/share/doc/file-libs-5.39', url: 'https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm' },
