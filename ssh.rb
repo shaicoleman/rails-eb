@@ -3,6 +3,7 @@
 require 'json'
 require 'yaml'
 require 'byebug'
+require 'open3'
 # require 'ap'
 require 'time'
 require 'action_view'
@@ -35,7 +36,7 @@ def load_config
 end
 
 def get_env_name
-  git_branch = `git rev-parse --abbrev-ref HEAD`.strip
+  git_branch = run('git rev-parse --abbrev-ref HEAD')
   @env_name = ARGV[0] ||
               @eb_config.dig('branch-defaults', git_branch, 'environment') ||
               @eb_config.dig('branch-defaults', 'default', 'environment')
@@ -47,7 +48,7 @@ def get_instances
         "--filters 'Name=tag:elasticbeanstalk:environment-name,Values=#{@env_name}' " \
         "--query 'Reservations[].Instances[]' " \
         "--output json"
-  result = JSON.parse(`#{cmd}`)
+  result = run(cmd, json: true)
   all_instances = result.map do |instance|
     {
       instance_id: instance['InstanceId'],
@@ -80,7 +81,7 @@ def validate_environment
   cmd = "aws elasticbeanstalk describe-environments " \
         "--query 'Environments[].EnvironmentName' " \
         "--output json"
-  env_names = JSON.parse(`#{cmd}`).sort
+  env_names = result = run(cmd, json: true).sort
 
   unless env_names.include?(@env_name)
     abort "Error: Environment name is invalid, valid environments are:\n#{env_names.join("\n")}"
@@ -137,7 +138,7 @@ def ec2_instance_connect
         "--instance-os-user #{@username} " \
         "--ssh-public-key file://#{@public_key} " \
         "--output json"
-  result = JSON.parse(`#{cmd}`)
+  result = run(cmd, json: true)
 end
 
 def ssh
@@ -154,6 +155,16 @@ def ssh
   puts "ssh -i #{@private_key} #{@username}@#{@instance[:public_ip]}"
 
   exec(cmd)
+end
+
+def run(cmd, json: false)
+  # puts "Run: #{cmd}"
+  stdout_str, stderr_str, status = Open3.capture3(cmd)
+  stdout_str.strip!
+  stderr_str.strip!
+  abort "Error running: #{cmd}\nErrors:\n#{stderr_str}" unless status.success?
+
+  (json ? JSON.parse(stdout_str) : stdout_str)
 end
 
 main
