@@ -55,11 +55,10 @@ end
 
 
 def run(cmd, ignore_errors: false)
-  cmd.strip!
-  log("Run: #{cmd}")
+  log("Run: #{cmd.squish}")
   stdout_str, stderr_str, status = Open3.capture3(cmd)
   unless status.success?
-    message = "Error running: #{cmd}\nOutput: #{stdout_str}, Errors: #{stderr_str}"
+    message = "Error running: #{cmd.squish}\nOutput: #{stdout_str.squish}, Errors: #{stderr_str.squish}"
     error(message, ignore_errors: ignore_errors)
   end
   { stdout: stdout_str, stderr: stderr_str, status: status }
@@ -85,4 +84,10 @@ end
 
 def finish
   log("#{@script_name} success")
+end
+
+class String
+  def squish
+    dup.gsub(/[[:space:]]+/, ' ').strip
+  end
 end
