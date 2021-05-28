@@ -19,7 +19,6 @@ def main
   copy_files
   create_symlinks
   run_handlers
-  restart_awslogs
   check_ruby_version
   # upgrade_bundler
   finish
@@ -60,7 +59,6 @@ AMAZON_LINUX_EXTRAS = %w[postgresql10]
 
 YUM_PACKAGES = [
   # Server monitoring/logging/security
-  { package: 'awslogs', creates: '/usr/sbin/awslogsd' },
   { package: 'amazon-cloudwatch-agent', creates: '/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent' },
   { package: 'amazon-ssm-agent', creates: '/usr/bin/amazon-ssm-agent' },
   { package: 'ec2-instance-connect', creates: '/opt/aws/bin/eic_run_authorized_keys' },
@@ -220,10 +218,6 @@ end
 
 def test_nginx_config
   run('nginx -t')
-end
-
-def restart_awslogs
-  run('systemctl enable awslogsd && systemctl restart awslogsd --no-block')
 end
 
 def create_users

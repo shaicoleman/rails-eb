@@ -55,6 +55,7 @@ end
 
 
 def run(cmd, ignore_errors: false)
+  cmd.strip!
   log("Run: #{cmd}")
   stdout_str, stderr_str, status = Open3.capture3(cmd)
   unless status.success?
