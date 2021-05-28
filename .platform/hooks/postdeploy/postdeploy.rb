@@ -4,7 +4,7 @@
 require_relative '../prebuild/build_utils'
 
 FILES = [
-  { source: 'amazon-cloudwatch-agent/config.json', target: '/opt/aws/amazon-cloudwatch-agent/bin/config.json' }
+  { source: 'amazon-cloudwatch-agent/config.json.erb', target: '/opt/aws/amazon-cloudwatch-agent/bin/config.json', template: 'erb' }
 ]
 
 def main
