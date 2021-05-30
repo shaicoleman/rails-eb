@@ -4,6 +4,7 @@
 require 'erb'
 require 'open3'
 require 'fileutils'
+require 'json'
 
 def copy_file(file)
   source = "#{__dir__}/files/#{file[:source]}"

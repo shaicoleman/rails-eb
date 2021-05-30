@@ -1,4 +1,12 @@
 <% eb_env = `/opt/elasticbeanstalk/bin/get-config container --key 'environment_name'`
+rails_env = ENV['RAILS_ENV'] || ENV['RACK_ENV']
+files = ['/var/log/secure', '/var/log/eb-engine.log', '/var/log/eb-hooks.log', '/var/log/nginx/error.log',
+         '/var/log/web.stdout.log', '/var/log/puma/puma.log', "/var/app/current/log/#{rails_env}.log"]
+collect_list = files.map do |file|
+  { file_path: file,
+    log_group_name: "/aws/elasticbeanstalk/#{eb_env}#{file}",
+    log_stream_name: '{instance_id}' }
+end
 %>{
   "agent": {
     "metrics_collection_interval": 60,
@@ -7,43 +15,7 @@
   "logs": {
     "logs_collected": {
       "files": {
-        "collect_list": [
-          {
-            "file_path": "/var/log/secure",
-            "log_group_name": "/aws/elasticbeanstalk/<%= eb_env %>/var/log/secure",
-            "log_stream_name": "{instance_id}"
-          },
-          {
-            "file_path": "/var/log/eb-engine.log",
-            "log_group_name": "/aws/elasticbeanstalk/<%= eb_env %>/var/log/eb-engine.log",
-            "log_stream_name": "{instance_id}"
-          },
-          {
-            "file_path": "/var/log/eb-hooks.log",
-            "log_group_name": "/aws/elasticbeanstalk/<%= eb_env %>/var/log/eb-hooks.log",
-            "log_stream_name": "{instance_id}"
-          },
-          {
-            "file_path": "/var/log/nginx/access.log",
-            "log_group_name": "/aws/elasticbeanstalk/<%= eb_env %>/var/log/nginx/access.log",
-            "log_stream_name": "{instance_id}"
-          },
-          {
-            "file_path": "/var/log/nginx/error.log",
-            "log_group_name": "/aws/elasticbeanstalk/<%= eb_env %>/var/log/nginx/error.log",
-            "log_stream_name": "{instance_id}"
-          },
-          {
-            "file_path": "/var/log/web.stdout.log",
-            "log_group_name": "/aws/elasticbeanstalk/<%= eb_env %>/var/log/web.stdout.log",
-            "log_stream_name": "{instance_id}"
-          },
-          {
-            "file_path": "/var/log/puma/puma.log",
-            "log_group_name": "/aws/elasticbeanstalk/<%= eb_env %>/var/log/puma/puma.log",
-            "log_stream_name": "{instance_id}"
-          }
-        ]
+        "collect_list": <%= JSON.pretty_generate(collect_list) %>
       }
     }
   },
