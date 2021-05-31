@@ -93,6 +93,7 @@ def init
 end
 
 def finish
+  Thread.list.each { |t| t.join unless t == Thread.current }
   log("#{@script_name} success")
 end
 
