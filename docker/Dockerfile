@@ -60,7 +60,7 @@ RUN \
 ### ruby-bundle
 FROM app-base AS ruby-bundle
 
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/local/share/gem/ruby/2.7.0/cache,sharing=locked \
+RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.local/share/gem/ruby/2.7.0/cache,sharing=locked \
   PATH="$HOME/.local/share/gem/ruby/2.7.0/bin:$PATH" && \
   echo " ===> Upgrading bundler" && \
   gem install bundler --silent && \
