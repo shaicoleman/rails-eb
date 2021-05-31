@@ -21,7 +21,7 @@ def chown_env_file_to_webapp
 end
 
 def update_motd
-  run('update-motd')
+  run_background('update-motd')
 end
 
 def restart_cloudwatch_agent
@@ -32,7 +32,7 @@ def restart_cloudwatch_agent
     systemctl enable amazon-cloudwatch-agent &&
     systemctl restart amazon-cloudwatch-agent --no-block
   EOT
-  run(cmd)
+  run_background(cmd)
 end
 
 main
