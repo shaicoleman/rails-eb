@@ -61,12 +61,12 @@ RUN \
 FROM app-base AS ruby-bundle
 
 RUN \
-  echo ' ===> Creating cache diretories' && \
-  mkdir -p /var/app/staging/vendor/bundle /home/webapp/.local
+  echo ' ===> Creating cache directories' && \
+  mkdir -p /var/app/staging/vendor/bundle /home/webapp/.local/share/gem/ruby/2.7.0/cache
 
 COPY --chown=webapp:webapp Gemfile Gemfile.lock /var/app/staging
 
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.local,sharing=locked \
+RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.local/share/gem/ruby/2.7.0/cache,sharing=locked \
   PATH="$HOME/.local/share/gem/ruby/2.7.0/bin:$PATH" && \
   echo " ===> Upgrading bundler" && \
   gem install bundler --silent && \
@@ -85,8 +85,8 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/vendor/bundle,s
   bundle install --quiet && \
   bundle config set --local deployment true && \
   echo " ===> Copying bundle" && \
-  mkdir -p ~/build && \
-  (tar -cf - --exclude 'vendor/bundle/ruby/2.7.0/cache' Gemfile Gemfile.lock .bundle vendor/bundle | tar -xC ~/build)
+  mkdir -p ~/build-app && \
+  (tar -cf - --exclude 'vendor/bundle/ruby/2.7.0/cache' Gemfile Gemfile.lock .bundle vendor/bundle | tar -xC ~/build-app)
 
 ### yarn-packages
 FROM app-base AS yarn-packages
@@ -98,14 +98,15 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.cache/yarn,sharing
   yarn install --silent --frozen-lockfile --non-interactive --production && \
   yarn autoclean && \
   echo " ===> Copying node_modules" && \
-  mkdir -p ~/build && \
-  cp -r package.json yarn.lock node_modules ~/build/
+  mkdir -p ~/build-app && \
+  cp -r package.json yarn.lock node_modules ~/build-app/
 
 # app-rails
 FROM app-base
 COPY --chown=root:root --from=ruby /opt/rubies /opt/rubies
-COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/build .
-COPY --chown=webapp:webapp --from=yarn-packages /home/webapp/build .
+COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/build-app .
+COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/.local /home/webapp/.local
+COPY --chown=webapp:webapp --from=yarn-packages /home/webapp/build-app .
 COPY --chown=webapp:webapp *.js* config.ru Rakefile .browserslistrc .
 COPY --chown=webapp:webapp app app/
 COPY --chown=webapp:webapp bin bin/
@@ -133,8 +134,12 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.c
 COPY --chown=webapp:webapp public/*.* public/
 
 RUN \
-  mkdir -p ~/build && \
-  tar -c --exclude=node_modules --exclude=log/* --exclude=config/local.rb . | zstd -T0 -11 > ~/build/app.tar.zst
+  echo ' ===> Creating app archive' && \
+  mkdir -p ~/build-out && \
+  tar -c --exclude=node_modules --exclude=log/* --exclude=config/local.rb . | zstd -T0 -11 > ~/build-out/app.tar.zst && \
+  echo ' ===> Creating home archive' && \
+  cd ~ && \
+  tar -c .local | zstd -T0 -11 > ~/build-out/home.tar.zst
 
 # RUN \
 #   cd ~/cashanalytics && \
