@@ -243,7 +243,7 @@ def configure_users
 
   copy_file({ source: 'sudoers.d/sudo', target: '/etc/sudoers.d/sudo' })
 
-  unless File.read('/etc/passwd').match?(%r{^webapp:.*:/bin/bash$})
+  unless File.read('/etc/passwd').match?(%r{^webapp:.*:/sbin/nologin$})
     run('usermod --shell /sbin/nologin webapp')
   end
 end
