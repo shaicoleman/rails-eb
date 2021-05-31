@@ -30,7 +30,7 @@ FILES = [
   { source: 'htop/htoprc', target: '/root/.config/htop/htoprc' },
   { source: 'journald/journald.conf', target: '/etc/systemd/journald.conf', handler: 'restart_journald' },
   { source: 'motd/10eb-banner', target: '/etc/update-motd.d/10eb-banner', no_backup: true },
-  { source: 'profile.d/profile.sh', target: '/etc/profile.d/profile.sh' },
+  { source: 'profile.d/profile.sh.erb', target: '/etc/profile.d/profile.sh', template: 'erb'  },
   { source: 'profile.d/prompt.sh', target: '/etc/profile.d/prompt.sh' },
   { source: 'profile.d/rbenv.sh', target: '/etc/profile.d/rbenv.sh' },
   { source: 'ssh/sshd_config', target: '/etc/ssh/sshd_config', handler: 'restart_sshd' },

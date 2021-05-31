@@ -55,7 +55,7 @@ def run_handlers
 end
 
 def ruby_version
-  @ruby_version ||= `ruby -e 'print RUBY_VERSION'`
+  @ruby_version ||= Dir['/opt/rubies/ruby-*'].max.match(/(?:-)+(.*)$/)&.captures&.first
 end
 
 def run(cmd, ignore_errors: false)
