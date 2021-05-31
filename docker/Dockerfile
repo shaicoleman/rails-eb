@@ -107,7 +107,7 @@ COPY --chown=root:root --from=ruby /opt/rubies /opt/rubies
 COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/build-app .
 COPY --chown=webapp:webapp --from=ruby-bundle /home/webapp/.local /home/webapp/.local
 COPY --chown=webapp:webapp --from=yarn-packages /home/webapp/build-app .
-COPY --chown=webapp:webapp *.js* config.ru Rakefile .browserslistrc .
+COPY --chown=webapp:webapp *.js* config.ru Rakefile .browserslistrc .ruby-version .
 COPY --chown=webapp:webapp app app/
 COPY --chown=webapp:webapp bin bin/
 COPY --chown=webapp:webapp config config/
