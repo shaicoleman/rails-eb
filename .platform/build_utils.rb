@@ -77,7 +77,7 @@ end
 
 def init
   abort 'Must be root' unless Process.uid == 0
-  Dir.chdir("#{__dir__}/../../..")  
+  Dir.chdir("#{__dir__}/..")
   @handlers = []
   @script_name = File.basename($PROGRAM_NAME, '.rb')
   log("#{@script_name} start")

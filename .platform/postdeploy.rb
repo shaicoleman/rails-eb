@@ -1,7 +1,7 @@
 #!/opt/elasticbeanstalk/lib/ruby/bin/ruby
 # frozen_string_literal: true
 
-require_relative '../prebuild/build_utils'
+require_relative './build_utils'
 
 FILES = [
   { source: 'amazon-cloudwatch-agent/config.json.erb', target: '/opt/aws/amazon-cloudwatch-agent/bin/config.json', template: 'erb' }
