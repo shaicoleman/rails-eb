@@ -16,10 +16,10 @@ def main
   cleanup_yum_packages
   install_zstd
   extract_app
+  check_ruby_version
   copy_files
   create_symlinks
   run_handlers
-  check_ruby_version
   # upgrade_bundler
   finish
 end
@@ -36,6 +36,7 @@ FILES = [
   { source: 'ssh/sshd_config', target: '/etc/ssh/sshd_config', handler: 'restart_sshd' },
   { source: 'ssh/sshd_service.conf', target: '/etc/systemd/system/sshd.service.d/sshd_service.conf', handler: 'restart_sshd' },
   { source: 'sysctl.d/local.conf', target: '/etc/sysctl.d/local.conf', handler: 'reload_sysctl' },
+  { source: 'ruby/gemrc', target: "/opt/rubies/ruby-#{ruby_version}/etc/gemrc" },
 
   { source: 'nginx/elasticbeanstalk-nginx-ruby-upstream.conf', target: '/etc/nginx/conf.d/elasticbeanstalk-nginx-ruby-upstream.conf', handler: 'test_nginx_config' },
   { source: 'nginx/gzip.conf', target: '/etc/nginx/conf.d/gzip.conf', handler: 'test_nginx_config' },
@@ -132,11 +133,10 @@ end
 
 def check_ruby_version
   return unless File.exist?('.ruby-version')
-  
+
   expected_ruby_version = File.read('.ruby-version').strip
-  current_ruby_version = `ruby -e 'print RUBY_VERSION'`
-  unless expected_ruby_version == current_ruby_version
-    log("Warning: .ruby-version mismatch - Expected: #{expected_ruby_version}, Current: #{current_ruby_version}. Renamed")
+  unless expected_ruby_version == ruby_version
+    log("Warning: .ruby-version mismatch - Expected: #{expected_ruby_version}, Current: #{ruby_version}. Renamed")
     FileUtils.mv('.ruby-version', '.ruby-version-mismatch')
   end
 end

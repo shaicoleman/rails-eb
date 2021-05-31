@@ -54,6 +54,9 @@ def run_handlers
   end
 end
 
+def ruby_version
+  @ruby_version ||= `ruby -e 'print RUBY_VERSION'`
+end
 
 def run(cmd, ignore_errors: false)
   log("Run: #{cmd.squish}")
