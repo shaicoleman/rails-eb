@@ -192,6 +192,8 @@ def cleanup_yum_packages
 end
 
 def install_yum_packages
+  copy_file({ source: 'yum/yum.conf', target: '/etc/yum.conf' })
+
   to_install = YUM_PACKAGES.reject { |item| Dir.glob(item[:creates]).any? } \
                            .map { |item| item[:url] || item[:package] }
   return if to_install.empty?
