@@ -120,13 +120,15 @@ ENV SECRET_KEY_BASE="none"
 ENV DEVISE_SECRET_KEY="none"
 ENV ENCRYPTION_KEY="123456044debc6f6c43f856bbb12e9c5070c33c63510586e30a4c60c3ecadb26"
 
-RUN mkdir -p node_modules/.cache tmp/cache/assets tmp/cache/webpacker/babel-loader-node-modules
+RUN \
+  echo ' ===> Creating cache diretories' && \
+  mkdir -p node_modules/.cache tmp/cache/assets tmp/cache/webpacker/babel-loader-node-modules
 RUN --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/node_modules/.cache,sharing=locked \
     --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/tmp/cache/assets,sharing=locked \
     --mount=type=cache,uid=1000,gid=1000,target=/var/app/staging/tmp/cache/webpacker/babel-loader-node-modules,sharing=locked \
-    echo " ===> rails assets:precompile" && \
-    rm -f bin/yarn && \
-    bin/rails assets:precompile
+  echo " ===> rails assets:precompile" && \
+  rm -f bin/yarn && \
+  bin/rails assets:precompile
 
 COPY --chown=webapp:webapp public/*.* public/
 
