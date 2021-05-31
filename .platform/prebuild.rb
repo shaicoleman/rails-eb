@@ -174,13 +174,13 @@ def install_nodejs_repo
   FileUtils.rm_rf('/opt/elasticbeanstalk/support/node-install')
   FileUtils.rm_f('/usr/bin/node') if File.symlink?('/usr/bin/node')
 
-  run('curl -sL https://rpm.nodesource.com/setup_14.x | bash -')
+  run('curl -sSL https://rpm.nodesource.com/setup_14.x | bash -')
 end
 
 def install_yarn_repo
   return if File.exist?('/etc/yum.repos.d/yarn.repo')
 
-  run('curl -sL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo')
+  run('curl -sSL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo')
 end
 
 def cleanup_yum_packages
