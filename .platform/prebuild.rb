@@ -188,7 +188,7 @@ def cleanup_yum_packages
                           .map { |item| item[:package] }
   return if to_cleanup.empty?
 
-  run("yum -y autoremove #{to_cleanup.join(' ')}")
+  run_background("yum -y autoremove #{to_cleanup.join(' ')}")
 end
 
 def install_yum_packages

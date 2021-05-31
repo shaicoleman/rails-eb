@@ -68,6 +68,12 @@ def run(cmd, ignore_errors: false)
   { stdout: stdout_str, stderr: stderr_str, status: status }
 end
 
+def run_background(cmd)
+  Thread.new do
+    run(cmd)
+  end
+end
+
 def log(message)
   puts message
   File.open('/var/log/deploy.log', 'a') { |f| f.print "#{Time.now.utc} #{message}\n" }
