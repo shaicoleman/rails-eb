@@ -249,7 +249,7 @@ def configure_users
 end
 
 def delete_ec2_user
-  `userdel --remove --force ec2-user` if File.exist?('/home/ec2-user')
+  run('userdel --remove --force ec2-user') if File.exist?('/home/ec2-user')
 end
 
 main
