@@ -224,6 +224,7 @@ def create_users
   unless `getent group sudo`.start_with?('sudo:')
     run('groupadd sudo')
   end
+  copy_file({ source: 'ruby/.gemrc', target: '/etc/skel/.gemrc' })
 
   USERS.each do |user|
     unless File.exist?("/home/#{user[:username]}")
