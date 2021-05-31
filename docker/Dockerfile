@@ -68,8 +68,8 @@ COPY --chown=webapp:webapp Gemfile Gemfile.lock /var/app/staging
 
 RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.local/share/gem/ruby/2.7.0/cache,sharing=locked \
   PATH="$HOME/.local/share/gem/ruby/2.7.0/bin:$PATH" && \
-  echo " ===> Upgrading bundler" && \
-  gem install bundler --silent && \
+  echo " ===> Installing bundler, reline" && \
+  gem install bundler reline --silent && \
   echo " ===> Configuring bundler" && \
   bundle config unset --local deployment && \
   bundle config set --local jobs 8 && \
