@@ -201,10 +201,6 @@ def install_yum_packages
   run("yum -y install #{to_install.join(' ')}")
 end
 
-def autoremove_yum_packages
-  run('yum -y autoremove') if File.exist?('/usr/bin/pango-list')
-end
-
 def reload_sysctl
   run('sysctl -p /etc/sysctl.d/local.conf', ignore_errors: true)
 end
