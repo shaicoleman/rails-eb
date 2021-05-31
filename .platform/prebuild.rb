@@ -128,7 +128,7 @@ end
 def install_zstd
   return if File.exist?('/usr/local/bin/zstd')
 
-  `curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/zstd/zstd-1.5.0.tar.xz | tar -xJC /`
+  run('curl -sSL https://ca-downloads.s3-eu-west-1.amazonaws.com/zstd/zstd-1.5.0.tar.xz | tar -xJC /')
 end
 
 def check_ruby_version
