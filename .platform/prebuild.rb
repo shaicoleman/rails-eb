@@ -16,11 +16,11 @@ def main
   cleanup_yum_packages
   install_zstd
   extract_app
+  extract_home
   check_ruby_version
   copy_files
   create_symlinks
   run_handlers
-  # upgrade_bundler
   finish
 end
 
@@ -141,19 +141,23 @@ def check_ruby_version
   end
 end
 
-def upgrade_bundler
-  gemfile_version = File.read('Gemfile.lock').match(/BUNDLED WITH\s+(\S+)/)&.captures&.first
-  installed_version = `ruby -e "require 'bundler'; print Bundler::VERSION"`
-  return if Gem::Version.new(installed_version) >= Gem::Version.new(gemfile_version)
-
-  run('gem install bundler')
-end
-
 def extract_app
   return unless File.exist?('.build/app.tar.zst')
 
   run('zstdcat .build/app.tar.zst | tar -x')
   FileUtils.rm_f('.build/app.tar.zst')
+end
+
+def extract_home
+  return unless File.exist?('.build/home.tar.zst')
+
+  usernames = USERS.map { |user| user[:username] } + ['webapp']
+  usernames.each do |username|
+    FileUtils.rm_f("/home/#{username}/.local")
+    run("zstdcat .build/home.tar.zst | tar -xC /home/#{username}")
+    FileUtils.chown_R(username, 'webapp', "/home/#{username}/.local")
+  end
+  FileUtils.rm_f('.build/home.tar.zst')
 end
 
 def enable_amazon_linux_extras
