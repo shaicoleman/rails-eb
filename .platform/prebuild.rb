@@ -7,7 +7,6 @@ def main
   init
   create_users
   configure_users
-  delete_ec2_user
   enable_eatmydata
   enable_swap
   nonblocking_dev_random
@@ -21,6 +20,7 @@ def main
   copy_files
   create_symlinks
   run_handlers
+  cleanup
   finish
 end
 
@@ -248,8 +248,9 @@ def configure_users
   end
 end
 
-def delete_ec2_user
+def cleanup
   run('userdel --remove --force ec2-user') if File.exist?('/home/ec2-user')
+  FileUtils.rm_f(Dir.glob('/etc/profile.d/{*.csh,csh.local}'))
 end
 
 main
