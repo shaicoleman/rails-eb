@@ -12,10 +12,8 @@ ENV LD_PRELOAD='/usr/lib64/libeatmydata.so'
 FROM al2-base AS al2-dev
 
 RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
-  echo ' ===> Enabling epel/postgresql10 repos' && \
-  amazon-linux-extras enable epel postgresql10 && \
-  echo ' ===> Configuring EPEL repo' && \
-  yum -y -q install epel-release && \
+  echo ' ===> Enabling postgresql10 repos' && \
+  amazon-linux-extras enable postgresql10 && \
   echo ' ===> Configuring Node repo' && \
   (curl -sSL https://rpm.nodesource.com/setup_14.x | bash -) && \
   echo ' ===> Configuring Yarn repo' && \
@@ -28,7 +26,9 @@ RUN --mount=type=cache,target=/var/cache/yum,sharing=locked \
     https://ca-downloads.s3-eu-west-1.amazonaws.com/file/file-libs-5.39-5.amzn2.x86_64.rpm \
   echo ' ===> Installing Ruby dependencies' && \
   yum -y -q install openssl openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel ncurses-devel gmp-devel \
-                    postgresql-devel libsodium && \
+                    postgresql-devel && \
+  echo ' ===> Installing libsodium' && \
+  yum -y -q install https://ca-downloads.s3-eu-west-1.amazonaws.com/libsodium/libsodium-1.0.18-1.el7.x86_64.rpm && \
   echo ' ===> Installing nodejs/yarn' && \
   yum -y -q install nodejs yarn && \
   echo ' ===> Installing zstd' && \
@@ -60,7 +60,7 @@ RUN \
 ### ruby-bundle
 FROM app-base AS ruby-bundle
 
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/webapp/.local/share/gem/ruby/2.7.0/cache,sharing=locked \
+RUN \
   PATH="$HOME/.local/share/gem/ruby/2.7.0/bin:$PATH" && \
   echo " ===> Upgrading bundler" && \
   gem install bundler --silent && \
