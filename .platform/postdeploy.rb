@@ -17,7 +17,8 @@ def main
 end
 
 def chown_env_file_to_webapp
-  FileUtils.chown 'webapp', 'webapp', '/opt/elasticbeanstalk/deployment/env'
+  FileUtils.chown('root', 'webapp', '/opt/elasticbeanstalk/deployment/env')
+  FileUtils.chmod(0440, '/opt/elasticbeanstalk/deployment/env')
 end
 
 def update_motd
