@@ -2,9 +2,7 @@
 
 require 'json'
 require 'yaml'
-require 'byebug'
 require 'open3'
-# require 'ap'
 require 'time'
 require 'action_view'
 

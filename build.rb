@@ -2,7 +2,6 @@
 
 require 'fileutils'
 require 'time'
-require 'byebug'
 require 'yaml'
 
 EXCLUDES = %w[vendor/bundle .build .git .bundle build.rb deploy.sh .byebug_history]
