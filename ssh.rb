@@ -24,7 +24,7 @@ def load_config
   @eb_config = YAML.safe_load(File.read('.elasticbeanstalk/config.yml'), aliases: true)
   @username = @eb_config.dig('ssh', 'username')
 
-  abort "Please add to your .elasticbeanstalk/config.yml:\nssh:\n  user_name: joe.bloggs\n  public_key: ~/.ssh/id_rsa.pub\n  private_key: ~/.ssh/id_rsa" if @username.to_s.empty?
+  abort "Please add to your .elasticbeanstalk/config.yml:\nssh:\n  username: joe.bloggs\n  public_key: ~/.ssh/id_rsa.pub\n  private_key: ~/.ssh/id_rsa" if @username.to_s.empty?
 
   @public_key = File.expand_path(@eb_config.dig('ssh', 'public_key') || '~/.ssh/id_rsa.pub')
   @private_key = File.expand_path(@eb_config.dig('ssh', 'private_key') || '~/.ssh/id_rsa')
